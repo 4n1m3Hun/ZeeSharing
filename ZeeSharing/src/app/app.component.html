@@ -225,12 +225,15 @@
           <clipPath id="a"><path fill="#fff" d="M0 0h982v239H0z" /></clipPath>
         </defs>
       </svg>
-      <h1>Hello, {{ title }}</h1>
+      <h1>Hello, </h1>
       <p>Congratulations! Your app is running. 🎉</p>
     </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
     <div class="right-side">
       <div class="pill-group">
+        <div *ngFor="let item of item$ | async;">
+          <span>{{ item.name }}</span>
+        </div>
         @for (item of [
           { title: 'Explore the Docs', link: 'https://angular.dev' },
           { title: 'Learn with Tutorials', link: 'https://angular.dev/tutorials' },
