@@ -6,7 +6,7 @@
     --color5: #5C8374;
     --color6: #93B1A6;
 }
-.login-page{
+.register-page{
     background-color: var(--color2);
     display: flex;
     justify-content: center;
@@ -89,19 +89,27 @@ button{
 button:hover{
     background-color: var(--color5);
 }
-
-
-.register-link {
+.login-link {
     margin-top: 20px;
 }
   
-.register-link a {
-    
+.login-link a {
     color: var(--color4);
     text-decoration: underline;
     cursor: pointer;
 }
   
-.register-link a:hover {
+.login-link a:hover {
     color: var(--color5);
+}
+select{
+    width: 100%;
+    margin-top: 1em;
+    background-color: var(--color3);
+    border: none;
+    color: var(--color1);
+    cursor: pointer;
+}
+.form-control input:focus ~ span{
+    width: 100%;
 }

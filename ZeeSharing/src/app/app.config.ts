@@ -7,6 +7,7 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { AuthGuard } from './auth.guard'; 
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 export const appConfig: ApplicationConfig = {
   providers: [

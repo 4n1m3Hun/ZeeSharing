@@ -7,7 +7,12 @@
     --color5: #5C8374;
     --color6: #93B1A6;
 }
+font-face {
+    font-family: Poppins;
+    src: url(font/Poppins-Light.ttf);
+}
 *{
     margin: 0;
     padding: 0;
+    font-family: 'Poppins', sans-serif;
 }
