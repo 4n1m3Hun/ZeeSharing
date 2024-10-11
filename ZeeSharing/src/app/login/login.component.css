@@ -1,0 +1,94 @@
+:root {
+    --color1: #ffffff;
+    --color2: #000000;
+    --color3: #040D12;
+    --color4: #183D3D;
+    --color5: #5C8374;
+    --color6: #93B1A6;
+}
+.login-page{
+    background-color: var(--color2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100vh;
+    color: var(--color1);
+}
+.container{
+    background-color: var(--color3);
+    width: 500px;
+    max-width: 100%;
+    min-height: 500px;
+    border-radius: 25px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25),
+        0 0px 10px rgba(0, 0, 0, 0.22);
+        position: relative;
+    overflow: hidden;
+}
+form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100%;
+    text-align: center;
+    position: relative;
+}
+h1{
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    margin: 0;
+    margin-bottom: 15px;
+}
+.form-control{
+    width: 75%;
+    position: relative;
+}
+.form-control span{
+    position: absolute;
+    border-bottom: 3px solid var(--color4);
+    left: 0;
+    bottom: 8px;
+    width: 0%;
+    transition: all 0.3s ease;
+}
+.form-control input:focus ~ span{
+    width: 100%;
+}
+input[type="email"], input[type="password"]{
+    background-color: var(--color3);
+    outline: none;
+    border: none;
+    border-bottom: 2px solid var(--color1);
+    padding: 12px 0;
+    margin: 8px 0;
+    width: 100%;
+    color: var(--color1);
+}
+.error {
+    color: var(--color6); /* Hibaüzenet színe */
+    position: absolute; /* Abszolút pozicionálás */
+    top: 10px;
+    
+}
+button{
+    position: relative;
+    border-radius: 20px;
+    border: 1px solid var(--color4);
+    background-color: var(--color4);
+    color: var(--color1);
+    font-size: 15px;
+    font-weight: 700;
+    margin: 20px;
+    padding: 12px 80px;
+    letter-spacing: 1px;
+    text-transform: capitalize;
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+    width: 230px;
+}
+button:hover{
+    letter-spacing: 3px;
+}
