@@ -1,0 +1,8 @@
+<div class="file-upload">
+  <h2>Upload MP3 file</h2>
+  <form (submit)="onFileUpload($event)">
+    <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".mp3" />
+    <!--<p *ngIf="fileError" class="error">{{ fileError }}</p>-->
+    <button type="submit" [disabled]="!selectedFile">Upload</button>
+  </form>
+</div>
