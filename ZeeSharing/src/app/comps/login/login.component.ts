@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Auth } from '@angular/fire/auth';
-import { signInWithEmailAndPassword } from '@angular/fire/auth';
+import { signInWithEmailAndPassword} from '@angular/fire/auth';
+import { sendPasswordResetEmail} from '@angular/fire/auth';
 
 
 @Component({
@@ -22,19 +23,29 @@ export class LoginComponent {
 
   async onLogin() {
     try {
-      // Bejelentkezés a Firebase Auth használatával
       const userCredential = await signInWithEmailAndPassword(this.auth, this.email, this.password);
       
-      // Sikeres bejelentkezés, átirányítás a főoldalra
       await this.router.navigate(['/dashboard']);
     } catch (error) {
-      // Hibás email vagy jelszó üzenet beállítása
       this.loginError = 'Wrong email or pasword!';
-      // Ha nem szeretnél hibát a konzolra írni, itt ne használd a console.error-t
     }
   }
   navigateToRegister() {
     this.router.navigate(['/register']);
+  }
+
+  async onForgotPassword() {
+    if (!this.email) {
+      this.loginError = "Please enter your email address.";
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(this.auth, this.email);
+      this.loginError = "A password reset link has been sent to your email!";
+    } catch (error: any) {
+      this.loginError = "Failed to send reset email. Please try again.";
+    }
   }
 }
 
