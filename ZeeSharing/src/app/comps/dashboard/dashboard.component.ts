@@ -1,16 +1,31 @@
-import { Component, inject } from '@angular/core';
-import { Storage, ref, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
-import { uploadBytes } from 'firebase/storage';
+import { Component, inject, OnInit } from '@angular/core';
+import { Storage, ref, getDownloadURL } from '@angular/fire/storage';
+import { Firestore, collection, getDocs, doc, setDoc } from '@angular/fire/firestore';
+import { CommonModule } from '@angular/common'; 
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
+  standalone: true, 
+  imports: [CommonModule],
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   selectedFile: File | null = null;
   fileError: string = '';
   downloadURL: string | null = null;
+  uploadedMusic: { name: string, audio: string }[] = [];
+  currentMusic: { name: string, audio: string } | null = null;
+  currentIndex: number = -1;
+
+  audioPlayer: HTMLAudioElement | null = null;
+
+  constructor(private firestore: Firestore) {}
+
+  ngOnInit() {
+    // Amikor a komponens betöltődik, töltse be az összes feltöltött zenét a Firestore-ból
+    this.loadUploadedMusic();
+  }
 
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
@@ -26,37 +41,73 @@ export class DashboardComponent {
 
   storage = inject(Storage);
 
-  onFileUpload(event: Event) {
+  async onFileUpload(event: Event) {
     event.preventDefault();
-
-    /*if (this.selectedFile) {
-      const filePath = `image/${Date.now()}_${this.selectedFile.name}`;
+    if (this.selectedFile) {
+      const filePath = `music/${Date.now()}_${this.selectedFile.name}`;
       const storageRef = ref(this.storage, filePath);
-      const uploadTask = await uploadBytes(storageRef, this.selectedFile);
-    }*/
-      if (this.selectedFile) {
-        const filePath = `music/${Date.now()}_${this.selectedFile.name}`; // Egyedi fájl elérési út
-        const storageRef = ref(this.storage, filePath); // Fájl referenciájának létrehozása
-  
-        // A feltöltés megkezdése
-        const uploadTask = uploadBytesResumable(storageRef, this.selectedFile);
-  
-        // A feltöltés folyamatának nyomon követése
-        uploadTask.on('state_changed', 
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100; // Előrehaladás kiszámítása
-            console.log('A feltöltés ' + progress + '% kész');
-          },
-          (error) => {
-            console.error('A feltöltés meghiúsult:', error);
-            this.fileError = 'A feltöltés meghiúsult. Kérlek, próbáld újra.';
-          },
-          async () => {
-            // A feltöltés sikeresen befejeződött, most lekérjük a letöltési URL-t
-            this.downloadURL = await getDownloadURL(storageRef);
-            console.log('Fájl elérhető itt:', this.downloadURL); // URL kiírása
-          }
-        );
+
+      try {
+        await setDoc(doc(this.firestore, 'Musics', this.selectedFile.name), {
+          audio: filePath,
+          name: this.selectedFile.name,
+          tags: []
+        });
+
+        this.downloadURL = await getDownloadURL(storageRef);
+        this.loadUploadedMusic(); // Töltse újra a zenelistát a feltöltés után
+      } catch (error) {
+        console.error('A feltöltés meghiúsult:', error);
+        this.fileError = 'A feltöltés meghiúsult. Kérlek, próbáld újra.';
       }
+    }
+  }
+
+  async loadUploadedMusic() {
+    const musicCollection = collection(this.firestore, 'Musics');
+    const musicSnapshot = await getDocs(musicCollection);
+
+    this.uploadedMusic = musicSnapshot.docs.map(docSnapshot => {
+      const data = docSnapshot.data();
+      return {
+        name: data['name'],
+        audio: data['audio']
+      };
+    });
+
+    // Alapértelmezés szerint az első zene kijelölése
+    if (this.uploadedMusic.length > 0) {
+      this.currentMusic = this.uploadedMusic[0];
+      this.currentIndex = 0;
+    }
+  }
+
+  playMusic(music: { name: string, audio: string }, index: number) {
+    this.currentMusic = music;
+    this.currentIndex = index;
+
+    if (!this.audioPlayer) {
+      this.audioPlayer = document.createElement('audio');
+      document.body.appendChild(this.audioPlayer);
+    }
+
+    this.audioPlayer.src = music.audio;
+    this.audioPlayer.play();
+  }
+
+  playNext() {
+    if (this.uploadedMusic.length > 0) {
+      // Ha a végén vagyunk, ugorjunk az elejére
+      const nextIndex = (this.currentIndex + 1) % this.uploadedMusic.length;
+      this.playMusic(this.uploadedMusic[nextIndex], nextIndex);
+    }
+  }
+
+  playPrevious() {
+    if (this.uploadedMusic.length > 0) {
+      // Ha az elején vagyunk, ugorjunk a végére
+      const prevIndex = (this.currentIndex - 1 + this.uploadedMusic.length) % this.uploadedMusic.length;
+      this.playMusic(this.uploadedMusic[prevIndex], prevIndex);
+    }
   }
 }

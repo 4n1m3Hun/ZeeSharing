@@ -2,7 +2,23 @@
   <h2>Upload MP3 file</h2>
   <form (submit)="onFileUpload($event)">
     <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".mp3" />
-    <!--<p *ngIf="fileError" class="error">{{ fileError }}</p>-->
     <button type="submit" [disabled]="!selectedFile">Upload</button>
   </form>
 </div>
+
+<div class="music-list">
+  <h2>Uploaded Music Files</h2>
+  <ul>
+    <li *ngFor="let music of uploadedMusic; let i = index" (click)="playMusic(music, i)">
+      <p>{{ music.name }}</p>
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="currentMusic" class="player-controls">
+  <h3>Now Playing: {{ currentMusic.name }}</h3>
+  <button (click)="playPrevious()">Previous</button>
+  <button (click)="playNext()">Next</button>
+</div>
+
+

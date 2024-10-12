@@ -7,7 +7,6 @@
     --color6: #93B1A6;
 }
 .register-page{
-    background-color: var(--color2);
     display: flex;
     justify-content: center;
     align-items: center;

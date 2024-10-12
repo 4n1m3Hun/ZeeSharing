@@ -1,0 +1,30 @@
+:root {
+    --color1: #ffffff;
+    --color2: #000000;
+    --color3: #040D12;
+    --color4: #183D3D;
+    --color5: #5C8374;
+    --color6: #93B1A6;
+}
+*{
+    color: white;
+}
+h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+ul{
+    list-style-type: none;
+    padding: 0;
+}
+li {
+    margin-bottom: 20px;
+}
+  
+audio {
+    width: 300px;
+    height: 30px; /* Az audio lejátszó magasságának megváltoztatása */
+    margin: 20px auto; /* Középre igazítás */
+    display: block;
+    background-color: var(--color6);
+}
