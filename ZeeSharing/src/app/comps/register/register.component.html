@@ -3,6 +3,10 @@
       <form (ngSubmit)="onRegister()">
         <h1>REGISTRATION</h1>
         <div class="form-control">
+          <input type="text" id="email" [(ngModel)]="u_name" name="u_name" required placeholder="Username">
+          <span></span>
+        </div>
+        <div class="form-control">
           <input type="email" id="email" name="email" [(ngModel)]="email" required placeholder="Email">
           <span></span>
         </div>

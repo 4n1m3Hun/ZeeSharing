@@ -57,7 +57,7 @@ h1{
 .form-control input:focus ~ span{
     width: 100%;
 }
-input[type="email"], input[type="password"]{
+input[type="email"], input[type="password"], input[type="text"]{
     background-color: var(--color3);
     outline: none;
     border: none;

@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { Auth } from '@angular/fire/auth';
 import { createUserWithEmailAndPassword } from '@angular/fire/auth';
 import { signInWithEmailAndPassword } from '@angular/fire/auth';
+import { Firestore, collection, addDoc, doc, setDoc } from '@angular/fire/firestore';
 import { isEmpty } from 'rxjs';
 
 
@@ -20,9 +21,11 @@ export class RegisterComponent {
   password: string = '';
   re_password: string = '';
   ac_type: string = '';
+  u_name: string = '';
   registerError: string = '';
 
-  constructor(private router: Router, private auth: Auth) {}
+  constructor(private router: Router, private auth: Auth, private firestore: Firestore) {}
+
 
   async onRegister() {
     try {
@@ -31,6 +34,14 @@ export class RegisterComponent {
       }else if(this.password == this.re_password){
         const userCredential = await createUserWithEmailAndPassword(this.auth, this.email, this.password);
         alert("Succesfull registration");
+
+        const userDocRef = doc(this.firestore, `Users/${this.email}`);
+        await setDoc(userDocRef, {
+          type: this.ac_type,
+          username: this.u_name,
+            picture: 'default.png' // Ha alapértelmezett képet használsz, ezt módosíthatod
+        });
+
         const userCredential2 = await signInWithEmailAndPassword(this.auth, this.email, this.password);
         await this.router.navigate(['/dashboard']);
       }else{
