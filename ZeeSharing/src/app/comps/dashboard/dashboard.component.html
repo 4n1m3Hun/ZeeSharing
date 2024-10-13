@@ -14,6 +14,11 @@
     </li>
   </ul>
 </div>
+<div>
+
+  
+</div>
+
 
 <div *ngIf="currentMusic" class="player-controls">
   <h3>Now Playing: {{ currentMusic.name }}</h3>
@@ -22,3 +27,40 @@
 </div>
 
 
+<div class="volume-control">
+  <label for="volume">Volume:</label>
+  
+</div>
+
+
+<div *ngIf="currentMusic" class="player">
+  <div class="m_data">
+    <img [src]="currentMusic.img" alt="Now Playing Image" class="music-image">
+    <div class="m_inf">
+      <p class="name">{{ currentMusic.name }}</p>
+      <p class="performer">Ado</p>
+    </div>
+  </div>
+  <div class="m_btns">
+    <div class="top">
+      <div class="icons">
+        <button (click)="toggleRandom()" class="icon random" [id]="isRandom ? 'toggle' : ''"><fa-icon [icon]="faRandom"></fa-icon></button>
+        <button (click)="playPrevious()" class="icon"><fa-icon [icon]="faBackward"></fa-icon></button>
+        <button (click)="togglePlayPause()" class="icon"><fa-icon [icon]="isPlaying ? faPause : faPlay"></fa-icon></button>
+        <button (click)="playNext()" class="icon"><fa-icon [icon]="faForward"></fa-icon></button>
+        <button (click)="toggleReplay()" class="icon random" [id]="isReplay ? 'toggle' : ''"><fa-icon [icon]="faRotateBack"></fa-icon></button>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="slide">
+        <a>{{ formatTime(audioCurrentTime) }}</a>
+        <input type="range" min="0" [max]="audioDuration" [value]="audioCurrentTime" (input)="seekMusic($event)" />
+        <a>{{ formatTime(audioDuration) }}</a>
+      </div>
+    </div>
+  </div>
+  <div class="volumediv">
+    <button (click)="toggleVolume()" class="icon"><fa-icon [icon]="volume > 0.5 ? faVolumeHigh : volume > 0 ? faVolumeLow : faVolumeXmark"></fa-icon></button>
+    <input type="range" id="volume" min="0" max="1" step="0.1" [(ngModel)]="volume" (input)="setVolume()" />
+  </div>
+</div>
