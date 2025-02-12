@@ -1,0 +1,28 @@
+<div class="all">
+    <div *ngFor="let list of userPlaylists" class="playList">
+        <span>{{list.title}}</span>
+        <div class="icons">
+            <fa-icon [icon]="faEye" [id]="list.type === 'private' ? 'red' : (list.type === 'public' ? 'green' : 'yellow')"></fa-icon>
+            <button><fa-icon [icon]="faArrowDown"></fa-icon></button>
+        </div>
+        <!--<img
+            [src]="song.img"
+            alt="{{ song.name }}"
+            class="song-image"
+            (click)="onSongSelected(song.performer, song.name)"
+          />
+          <fa-icon [icon]="volume > 0.5 ? faVolumeHigh : volume > 0 ? faVolumeLow : faVolumeXmark"-->
+    </div>
+    <div class="playList">
+        <span>Dowloded Musics</span>
+        <div class="icons">
+            <fa-icon [icon]="faEye" id="red"></fa-icon>
+            <button><fa-icon [icon]="faArrowDown"></fa-icon></button>
+        </div>
+        <br>
+        <div *ngFor="let list of downloadedMusic" >
+            {{list}} <br>
+        </div>
+    </div>
+</div>
+

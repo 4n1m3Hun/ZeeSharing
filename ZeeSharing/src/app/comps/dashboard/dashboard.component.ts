@@ -1,23 +1,46 @@
 import { Component, inject, OnInit} from '@angular/core';
 import { Storage, ref, getDownloadURL } from '@angular/fire/storage';
-import { Firestore, collection, getDocs, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, collection, getDocs, doc, setDoc, addDoc } from '@angular/fire/firestore';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {faPlay, faPause, faBackward, faForward, faRandom, faRotateBack, faVolumeHigh, faVolumeXmark, faVolumeLow  } from '@fortawesome/free-solid-svg-icons';
+import {faDownload, faSignOut, faUpload, faTv, faPlus, faX, faMusic, faList, faUser, faPlay, faPause, faBackward, faForward, faRandom, faRotateBack, faVolumeHigh, faVolumeXmark, faVolumeLow  } from '@fortawesome/free-solid-svg-icons';
+import { LatestMusicComponent } from '../latest-music/latest-music.component';
+import { LatestPodcastComponent } from '../latest-podcast/latest-podcast.component';
+import { UploadMusicComponent } from '../upload-music/upload-music.component';
+import { CreatePlayListComponent } from '../create-play-list/create-play-list.component';
+import { PlayListsComponent } from '../play-lists/play-lists.component';
+import { RecommendedMusicComponent } from '../recommended-music/recommended-music.component';
+import { PopularMusicComponent } from '../popular-music/popular-music.component';
+
+import { User } from '@angular/fire/auth';
+import { UserService } from '../../user.service';
+
+import { Router } from '@angular/router';
+import { Auth, signOut } from '@angular/fire/auth';
+
+export interface Zene {
+  name: string;
+  audio: string;
+  performer: string;
+  img?: string;
+  tags?: string[];
+}
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, FormsModule],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, LatestMusicComponent, LatestPodcastComponent, UploadMusicComponent, CreatePlayListComponent, PlayListsComponent, RecommendedMusicComponent, PopularMusicComponent],
 })
-export class DashboardComponent implements OnInit {
-  selectedFile: File | null = null;
-  fileError: string = '';
-  downloadURL: string | null = null;
+export class DashboardComponent implements OnInit{
+  userData: User | null = null;
 
+ 
+  ngOnInit(): void {
+    this.userData = this.userService.getUserData();
+  }
   faPlay = faPlay;
   faPause = faPause;
   faBackward = faBackward;
@@ -26,133 +49,125 @@ export class DashboardComponent implements OnInit {
   faRotateBack = faRotateBack;
   faVolumeHigh = faVolumeHigh;
   faVolumeXmark = faVolumeXmark;
-  faVolumeLow = faVolumeLow
+  faVolumeLow = faVolumeLow;
+  faMusic = faMusic;
+  faList = faList;
+  faUser = faUser;
+  faPlus = faPlus;
+  faX = faX;
+  faUpload = faUpload;
+  faTv = faTv;
+  faSignOut = faSignOut;
+  faDownload = faDownload;
 
-  // Az img mező opcionális, ha nem akarod kötelezővé tenni
-  uploadedMusic: { name: string; audio: string; img?: string }[] = [];
-  currentMusic: { name: string; audio: string; img?: string } | null = null;
+  constructor(private firestore: Firestore, private auth: Auth, private router: Router, private userService: UserService){}
+  
+  //ha rákattintunk
+
+  songsByPerformer: Zene[] = [];
+  currentMusic: Zene | null = null;
   currentIndex: number = -1;
-  isPlaying: boolean = false;
-  isRandom: boolean = false;
-  isReplay: boolean = false;
+  audioPlayer: HTMLAudioElement | null = null;
+
   volume: number = 1;
   revolume: number = 1;
+  audioDuration: number = 0;
+  audioCurrentTime: number = 0;
 
-  audioPlayer: HTMLAudioElement | null = null;
-  audioDuration: number = 0; // A zene teljes hossza másodpercekben
-  audioCurrentTime: number = 0; // Az aktuális zene pozíciója másodpercekben
+  isPlaying: boolean = false;
+  isRandom: boolean = false;
+  isReplay: number = 0;
 
-
-  constructor(private firestore: Firestore){}
-
-
-  ngOnInit() {
-    // Amikor a komponens betöltődik, töltse be az összes feltöltött zenét a Firestore-ból
-    this.loadUploadedMusic();
+  /*Lejátszó*/
+  handleSongClicked(event: { songs: Zene[]; index: number }) {
+    this.songsByPerformer = event.songs;
+    //console.clear();
+    //console.log('Songs by performer:', this.songsByPerformer);
+    if (this.songsByPerformer.length > 0) {
+      this.playMusic(event.index)
+    }
   }
+  playMusic(toindex: number) {
+    this.currentIndex = toindex;
+    this.currentMusic = this.songsByPerformer[this.currentIndex];
     
-
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-
-    if (file && file.type === 'audio/mpeg') {
-      this.selectedFile = file;
-      this.fileError = '';
-    } else {
-      this.selectedFile = null;
-      this.fileError = 'Only MP3 files are allowed!';
-    }
-  }
-
-  storage = inject(Storage);
-
-  async onFileUpload(event: Event) {
-    event.preventDefault();
-    if (this.selectedFile) {
-      const filePath = `music/${Date.now()}_${this.selectedFile.name}`;
-      const storageRef = ref(this.storage, filePath);
-
-      try {
-        // Zene adatainak tárolása Firestore-ban
-        await setDoc(doc(this.firestore, 'Musics', this.selectedFile.name), {
-          audio: filePath,
-          name: this.selectedFile.name,
-          tags: [],
-          img: "assets/default-image.png", // Alapértelmezett kép URL-je
-        });
-
-        this.downloadURL = await getDownloadURL(storageRef);
-        this.loadUploadedMusic(); // Töltse újra a zenelistát a feltöltés után
-      } catch (error) {
-        console.error('A feltöltés meghiúsult:', error);
-        this.fileError = 'A feltöltés meghiúsult. Kérlek, próbáld újra.';
-      }
-    }
-  }
-
-  async loadUploadedMusic() {
-    const musicCollection = collection(this.firestore, 'Musics');
-    const musicSnapshot = await getDocs(musicCollection);
-
-    this.uploadedMusic = musicSnapshot.docs.map(docSnapshot => {
-      const data = docSnapshot.data();
-      const musicData = {
-        name: data['name'],
-        audio: data['audio'],
-        img: data['img'] || 'assets/default-image.png', // Alapértelmezett kép, ha az img üres
-      };
-      console.log('Music Data:', musicData);
-      return musicData;
-    });
-
-    // Alapértelmezés szerint az első zene kijelölése
-    if (this.uploadedMusic.length > 0) {
-      this.currentMusic = this.uploadedMusic[0];
-      this.currentIndex = 0;
-    }
-  }
-
-  playMusic(music: { name: string; audio: string; img?: string }, index: number) {
-    this.currentMusic = music; // Most már itt is beállítjuk a currentMusic-ot
-    this.currentIndex = index;
-  
     if (!this.audioPlayer) {
       this.audioPlayer = document.createElement('audio');
       document.body.appendChild(this.audioPlayer);
     }
     
-    // Ha nem játszik, állítsuk be a forrást és indítsuk el a zenét
-    if (!this.isPlaying) {
-      this.audioPlayer.src = music.audio;
-      this.audioPlayer.play();
-      this.isPlaying = true;
-    }
-  
-    // Kiírjuk a konzolra a zene képének elérési útját
-    //console.log('Currently playing image:', music.img);
-  
-    // Frissítjük a zene hosszát
+    this.audioPlayer.src = this.songsByPerformer[this.currentIndex].audio;
+    this.audioPlayer.play();
+    this.isPlaying = true;
+
     this.audioPlayer.onloadedmetadata = () => {
       this.audioDuration = this.audioPlayer?.duration || 0;
-      this.audioCurrentTime = 0; // Reset current time
-      this.updateCurrentTime(); // Indítsuk el az aktuális idő frissítését
+      this.audioCurrentTime = 0;
+      this.updateCurrentTime();
     };
-    
-    // Frissítjük az aktuális időt a lejátszás során
-    this.audioPlayer.ontimeupdate = () => {
-      this.audioCurrentTime = this.audioPlayer?.currentTime || 0;
-    };
-
-    this.audioPlayer.volume = this.volume;
+    const playHistoryCollection = collection(this.firestore, 'PlayHistory');
+    addDoc(playHistoryCollection, {
+      user: this.userData?.email, // Bejelentkezett felhasználó e-mail címe
+      name: this.currentMusic.name,
+      performer: this.currentMusic.performer,
+      tags: this.currentMusic.tags || [],
+      img: this.currentMusic.img,
+      playedAt: new Date(),
+    });
   }
-
+  playNext() {
+    if (this.songsByPerformer.length > 0) {
+      if(this.isReplay == 1){
+        this.playMusic(this.currentIndex);
+        this.isReplay = 0;
+      }else if(this.isReplay == 2){
+        this.playMusic(this.currentIndex);
+      }else if(this.isRandom){
+        let random = Math.floor(Math.random() * this.songsByPerformer.length);
+        while(random == this.currentIndex){
+          random = Math.floor(Math.random() * this.songsByPerformer.length);
+        }
+        this.currentIndex = random;
+        this.playMusic(this.currentIndex);
+      }else{
+        if(this.currentIndex + 1 >= this.songsByPerformer.length){
+          this.currentIndex = 0;
+        }else{
+          this.currentIndex += 1;
+        }
+        this.playMusic(this.currentIndex);
+      }
+    }
+  }
+  playPrevious() {
+    if (this.songsByPerformer.length > 0) {
+      if(this.currentIndex - 1  < 0){
+        this.currentIndex = this.songsByPerformer.length -1 ;
+      }else{
+        this.currentIndex -= 1;
+      }
+      this.playMusic(this.currentIndex);
+    }
+  }
+  updateCurrentTime() {
+    if (this.audioPlayer) {
+      const interval = setInterval(() => {
+        if (this.audioPlayer) {
+          this.audioCurrentTime = this.audioPlayer.currentTime;
+  
+          if (this.audioCurrentTime >= this.audioDuration) {
+            this.playNext();
+            clearInterval(interval);
+          }
+        }
+      }, 1000);
+    }
+  }
   setVolume() {
     if (this.audioPlayer) {
       this.audioPlayer.volume = this.volume;
     }
   }
-    
-
   togglePlayPause() {
     if (this.audioPlayer) {
       if (this.isPlaying) {
@@ -160,23 +175,7 @@ export class DashboardComponent implements OnInit {
       } else {
         this.audioPlayer.play();
       }
-      this.isPlaying = !this.isPlaying; // Állapot váltása
-    }
-  }
-  toggleRandom(){
-    if(this.isRandom){
-      this.isRandom = false;
-    }else{
-      this.isRandom = true;
-      this.isReplay = false;
-    }
-  }
-  toggleReplay(){
-    if(this.isReplay){
-      this.isReplay = false;
-    }else{
-      this.isReplay = true;
-      this.isRandom = false;
+      this.isPlaying = !this.isPlaying;
     }
   }
   toggleVolume(){
@@ -190,39 +189,19 @@ export class DashboardComponent implements OnInit {
       this.audioPlayer.volume = this.volume;
     }
   }
-  updateCurrentTime() {
-    // Frissítjük az aktuális időt, amíg a zene játszik
-    if (this.audioPlayer) {
-      const interval = setInterval(() => {
-        if (this.audioPlayer) { // Null-ellenőrzés
-          this.audioCurrentTime = this.audioPlayer.currentTime;
-  
-          // Ellenőrizzük, hogy a zene véget ért-e
-          if (this.audioCurrentTime >= this.audioDuration) {
-            if (this.isRandom) {
-              let random = Math.floor(Math.random() * this.uploadedMusic.length);
-
-              if (this.audioPlayer && this.isPlaying) {
-                this.audioPlayer.pause();
-                this.isPlaying = false; // Állapot frissítése
-              }
-              this.playMusic(this.uploadedMusic[random], random); // Véletlenszerű zene lejátszása
-            } else if(this.isReplay){
-              if (this.audioPlayer && this.isPlaying) {
-                this.audioPlayer.pause();
-                this.isPlaying = false; // Állapot frissítése
-              }
-              this.playMusic(this.uploadedMusic[this.currentIndex], this.currentIndex); // Véletlenszerű zene lejátszása
-            }
-            else {
-              console.log(Math.floor(Math.random() * this.uploadedMusic.length) + 1);
-              this.playNext(); // Következő zene lejátszása this.uploadedMusic.length
-            }
-            clearInterval(interval); // Megszüntetjük az időzítőt
-          }
-        }
-      }, 1000);
+  toggleRandom(){
+    this.isRandom = !this.isRandom;
+    this.isReplay = 0;
+  }
+  toggleReplay(){
+    if(this.isReplay == 0){
+      this.isReplay = 1;
+    }else if(this.isReplay == 1){
+      this.isReplay = 2;
+    }else{
+      this.isReplay = 0;
     }
+    this.isRandom = false;
   }
   seekMusic(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -231,41 +210,75 @@ export class DashboardComponent implements OnInit {
       this.audioPlayer.currentTime = newTime;
     }
   }
-  formatTime(time: number): string {
+  formatTime(time: number){
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   }
-
-  playNext() {
-    if (this.uploadedMusic.length > 0) {
-      // Ha a végén vagyunk, ugorjunk az elejére
-      const nextIndex = (this.currentIndex + 1) % this.uploadedMusic.length;
+  async downloadSong(audioUrl: string, name: string) {
+    try {
+      const response = await fetch(audioUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
       
-      // Az aktuális zene leállítása
-      if (this.audioPlayer && this.isPlaying) {
-        this.audioPlayer.pause();
-        this.isPlaying = false; // Állapot frissítése
-      }
-  
-      // A következő zene elindítása
-      this.playMusic(this.uploadedMusic[nextIndex], nextIndex);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = name + ".mp3";
+      document.body.appendChild(link);
+      link.click();
+      
+      // Takarítás
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Hiba a letöltés során:", error);
     }
   }
 
-  playPrevious() {
-    if (this.uploadedMusic.length > 0) {
-      // Ha az elején vagyunk, ugorjunk a végére
-      const prevIndex = (this.currentIndex - 1 + this.uploadedMusic.length) % this.uploadedMusic.length;
-      
-      // Az aktuális zene leállítása
-      if (this.audioPlayer && this.isPlaying) {
-        this.audioPlayer.pause();
-        this.isPlaying = false; // Állapot frissítése
-      }
-  
-      // A következő zene elindítása
-      this.playMusic(this.uploadedMusic[prevIndex], prevIndex);
+  /*kilépes*/
+  async logout() {
+    try {
+      await signOut(this.auth); // Kijelentkezés
+      this.router.navigate(['/login'], { replaceUrl: true }); // Vissza a Login oldalra
+    } catch (error) {
+      console.error('Error during logout:', error);
     }
+  }
+
+  /*gombok*/
+  showUpload: boolean = false;
+  showList: boolean = true;
+  toggleMusicList(){
+    this.showUpload = false;
+    this.showList = true;
+  }
+  toggleUploadMusic(){
+    this.showUpload = true;
+    this.showList = false;
+  }
+
+  //Create PlayList
+  showCreatePlaylist =false;
+
+  showUserPlayList = false;
+  showUserFriendList = false;
+  showCurrentlyPlayList =true;
+  toggleShowCurrentlyPlaylist(){
+    this.showCurrentlyPlayList = true;
+    this.showUserFriendList = false;
+    this.showUserPlayList = false;
+  }
+  toggleShowUserFriendList(){
+    this.showCurrentlyPlayList = false;
+    this.showUserFriendList = true;
+    this.showUserPlayList = false;
+  }
+  toggleShowUserPlayList(){
+    this.showCurrentlyPlayList = false;
+    this.showUserFriendList = false;
+    this.showUserPlayList = true;
+  }
+  toggleCreatePlaylist() {
+    this.showCreatePlaylist = !this.showCreatePlaylist;
   }
 }

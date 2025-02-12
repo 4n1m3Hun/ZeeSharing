@@ -1,0 +1,28 @@
+<div class="file-upload">
+    <h2>Upload MP3 file</h2>
+    <form (submit)="onFileUpload($event)">
+      <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".mp3" />
+      <input type="text" name="title" placeholder="Music Title" id="MusicTitle" [(ngModel)]="title" required>
+      <br>
+      <input type="file" id="ImgInput" accept=".png, .jpg, .jpeg" (change)="onImgSelected($event)" class="hidden-file-input" />
+      <div class="buttons">
+        <button class="imgBtn" (click)="toggleisUpImg()">képet feltölteni</button><br>
+        <button
+          [id]="!selectedFile ? 'not' : ''" 
+          type="submit" [disabled]="!selectedFile">Upload
+        </button>
+      </div>
+    </form>
+    <div class="tags-section">
+      <!--<h3>Select Tags:</h3>-->
+      <div class="avTags" id="flex">
+        <button 
+          *ngFor="let tag of availableTags" 
+          type="button" 
+          (click)="toggleTag(tag)" 
+          [id]="selectedTags.includes(tag) ? 'in' : ''">
+          {{ tag }}
+        </button>
+      </div>
+    </div>
+  </div>

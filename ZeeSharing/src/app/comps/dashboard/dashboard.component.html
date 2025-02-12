@@ -1,44 +1,91 @@
-<div class="file-upload">
-  <h2>Upload MP3 file</h2>
-  <form (submit)="onFileUpload($event)">
-    <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".mp3" />
-    <button type="submit" [disabled]="!selectedFile">Upload</button>
-  </form>
+<div *ngIf="showCreatePlaylist" class="popup-createPlay">
+  <div class="CreatePlayList">
+    <app-create-play-list></app-create-play-list>
+    <button class="close-btn" (click)="toggleCreatePlaylist()"><fa-icon [icon]="faX"></fa-icon></button>
+  </div>
+</div>
+<div class="menu-buttons">
+  <div class="left-buttons">
+    <button (click)="toggleShowCurrentlyPlaylist()" [ngClass]="showCurrentlyPlayList ? 'focusBtn' : 'notfocusBtn'"><fa-icon [icon]="faMusic"></fa-icon></button>
+    <button (click)="toggleShowUserPlayList()" [ngClass]="showUserPlayList ? 'focusBtn' : 'notfocusBtn'"><fa-icon [icon]="faList"></fa-icon></button>
+    <button (click)="toggleShowUserFriendList()" [ngClass]="showUserFriendList ? 'focusBtn' : 'notfocusBtn'"><fa-icon [icon]="faUser"></fa-icon></button>
+    
+  </div>
+  <div class="right-buttons">
+    <button (click)="toggleMusicList()" [ngClass]="showList ? 'focusBtn' : 'notfocusBtn'"><fa-icon [icon]="faTv"></fa-icon></button>
+    <button (click)="toggleUploadMusic()" [ngClass]="showUpload ? 'focusBtn' : 'notfocusBtn'"><fa-icon [icon]="faUpload"></fa-icon></button>
+    <button (click)="logout()" class="focusBtn logOut"><fa-icon [icon]="faSignOut"></fa-icon></button>
+    
+  </div>
+</div>
+<div class="musics">
+  <div class="player-lists">
+    <div class="playLists"  *ngIf="showUserPlayList">
+      <span>Your Playlists</span>
+      <button id="close-crpl" (click)="toggleCreatePlaylist()"><fa-icon [icon]="faPlus"></fa-icon></button>
+      <app-play-lists></app-play-lists>
+    </div>
+    <div class="list" *ngIf="showCurrentlyPlayList">
+      <span>Currently Playing</span>
+      <div *ngFor="let song of songsByPerformer; let i = index" class="currentList">
+        <div class="listItems">
+          <div (click)="playMusic(i)" class="item">
+            <div class="img">
+              <img [src]="song.img" alt="Now Playing Image" class="">
+            </div>
+            <div class="data">
+              {{ song.name }}
+            </div>
+            <div class="visual" 
+              *ngIf="i == currentIndex"
+              [ngClass]="{'playing': !isPlaying}">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+            <!--<img class="playerGIF"  src="https://firebasestorage.googleapis.com/v0/b/zeesharing-d33f2.appspot.com/o/image%2FNt6v.gif?alt=media&token=a51c857b-bf4b-4dd6-93b7-18ad1d32b4a5" alt="Computer man">-->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="userLists"  *ngIf="showUserFriendList">
+      Your Friends
+    </div>
+  </div>
+  <div class="music-lists">
+    <div class="list">
+      <!--<div class="menuItems">
+        <button>All</button>
+        <button>Music</button>
+        <button>Podcast</button>
+      </div>-->
+      <div class="upload" *ngIf="showUpload">
+        <app-upload-music></app-upload-music>
+      </div>
+      <div class="rows" *ngIf="showList">
+        <app-latest-music 
+          (songClicked)="handleSongClicked($event)">
+        </app-latest-music>
+        <!--<app-latest-podcast></app-latest-podcast>-->
+        <app-recommended-music
+          (songClicked)="handleSongClicked($event)">>
+        </app-recommended-music>
+        <app-popular-music></app-popular-music>
+        <app-latest-music></app-latest-music>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="music-list">
-  <h2>Uploaded Music Files</h2>
-  <ul>
-    <li *ngFor="let music of uploadedMusic; let i = index" (click)="playMusic(music, i)">
-      <p>{{ music.name }}</p>
-    </li>
-  </ul>
-</div>
-<div>
 
-  
-</div>
-
-
-<div *ngIf="currentMusic" class="player-controls">
-  <h3>Now Playing: {{ currentMusic.name }}</h3>
-  <button (click)="playPrevious()">Previous</button>
-  <button (click)="playNext()">Next</button>
-</div>
-
-
-<div class="volume-control">
-  <label for="volume">Volume:</label>
-  
-</div>
-
-
-<div *ngIf="currentMusic" class="player">
+<div  class="player">
   <div class="m_data">
-    <img [src]="currentMusic.img" alt="Now Playing Image" class="music-image">
-    <div class="m_inf">
+    <img *ngIf="currentMusic" [src]="currentMusic.img" alt="Now Playing Image" class="music-image">
+    <div *ngIf="currentMusic" class="m_inf">
       <p class="name">{{ currentMusic.name }}</p>
-      <p class="performer">Ado</p>
+      <p class="performer">{{ currentMusic.performer }}</p>
     </div>
   </div>
   <div class="m_btns">
@@ -48,7 +95,7 @@
         <button (click)="playPrevious()" class="icon"><fa-icon [icon]="faBackward"></fa-icon></button>
         <button (click)="togglePlayPause()" class="icon"><fa-icon [icon]="isPlaying ? faPause : faPlay"></fa-icon></button>
         <button (click)="playNext()" class="icon"><fa-icon [icon]="faForward"></fa-icon></button>
-        <button (click)="toggleReplay()" class="icon random" [id]="isReplay ? 'toggle' : ''"><fa-icon [icon]="faRotateBack"></fa-icon></button>
+        <button (click)="toggleReplay()" class="icon random" [id]="isReplay === 1 ? 'tog' : isReplay === 2 ? 'toggle' : ''"><fa-icon [icon]="faRotateBack"></fa-icon></button>
       </div>
     </div>
     <div class="bottom">
@@ -60,6 +107,10 @@
     </div>
   </div>
   <div class="volumediv">
+    <button *ngIf="currentMusic" (click)="downloadSong(currentMusic.audio, currentMusic.name)">
+      <fa-icon [icon]="faDownload"></fa-icon>
+    </button>
+    
     <button (click)="toggleVolume()" class="icon"><fa-icon [icon]="volume > 0.5 ? faVolumeHigh : volume > 0 ? faVolumeLow : faVolumeXmark"></fa-icon></button>
     <input type="range" id="volume" min="0" max="1" step="0.1" [(ngModel)]="volume" (input)="setVolume()" />
   </div>

@@ -9,19 +9,18 @@ import { AuthGuard } from './auth.guard';
 import { provideStorage, getStorage } from '@angular/fire/storage'; // Firebase Storage importálása
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HttpClientModule, provideHttpClient } from '@angular/common/http'; // Importáld az HttpClientModule-t
 
 const firebaseConfig = {
   apiKey: "AIzaSyD0YhsRRNmsdIon2QEAff_L3Ixqm4ckmyk",
-    authDomain: "zeesharing-d33f2.firebaseapp.com",
-    projectId: "zeesharing-d33f2",
-    storageBucket: "zeesharing-d33f2.appspot.com",
-    messagingSenderId: "543231526802",
-    appId: "1:543231526802:web:5e50c19b8f861e7918234b"
+  authDomain: "zeesharing-d33f2.firebaseapp.com",
+  projectId: "zeesharing-d33f2",
+  storageBucket: "zeesharing-d33f2.appspot.com",
+  messagingSenderId: "543231526802",
+  appId: "1:543231526802:web:5e50c19b8f861e7918234b"
 };
 
-
 export const appConfig: ApplicationConfig = {
-  
   providers: [
     provideRouter(routes), 
     provideZoneChangeDetection({ eventCoalescing: true }), 
@@ -30,6 +29,7 @@ export const appConfig: ApplicationConfig = {
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
     provideStorage(() => getStorage()),
+    provideHttpClient(), // Add hozzá az HttpClient szolgáltatást
     AuthGuard,
   ]
 };

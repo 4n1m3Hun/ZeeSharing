@@ -1,0 +1,40 @@
+:root {
+  --color1: #ffffff;
+  --color2: #000000;
+  --color3: #040D12;
+  --color4: #183D3D;
+  --color5: #5C8374;
+  --color6: #93B1A6;
+}
+h2{
+  margin-bottom: 30px;
+  color: var(--color1);
+}
+.row{
+  display: flex;
+}
+.row .item{
+  width: 16.6%;
+  padding: 14px;
+}
+.square img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+.square {
+  width: 100%;
+  position: relative; 
+  padding-top: 100%; 
+  overflow: hidden; 
+}
+.song-info{
+  margin-top: 15px;
+}
+.song-permorfer{
+  color: var(--color4);
+}

@@ -1,0 +1,47 @@
+:root {
+    --color1: #ffffff;
+    --color2: #000000;
+    --color3: #040D12;
+    --color4: #183D3D;
+    --color5: #5C8374;
+    --color6: #93B1A6;
+}
+.createPlayList{
+    background-color: var(--color3);
+    border: none;
+    border-radius: 15px;
+    padding: 1em;
+}
+h1{
+    margin-bottom: 1em;
+    text-align: center;
+}
+input, select{
+    width: 100%;
+    margin: 0.5em 0;
+    background-color: var(--color3);
+    outline: none;
+    border: none;
+    border-bottom: 2px solid gray;
+    padding: 12px 0;
+    color: var(--color1);
+}
+input{
+}
+button{
+    border-radius: 20px;
+    background-color: var(--color4);
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px 20px;
+    text-transform: capitalize;
+    cursor: pointer;
+    color: var(--color1);
+    transition: all 0.3s ease;
+    border: none;
+    align-items: center;
+    margin-top: 1em;
+}
+button:hover{
+    background-color: var(--color5);
+}

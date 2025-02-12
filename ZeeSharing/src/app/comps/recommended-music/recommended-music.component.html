@@ -1,0 +1,19 @@
+<div class="latest-music">
+    <h2>Recommended Songs</h2>
+    <div class="row">
+      <div *ngFor="let song of latestSongs" class="item">
+        <div class="square">
+          <img
+            [src]="song.img"
+            alt="{{ song.name }}"
+            class="song-image"
+            (click)="onSongSelected(song.performer, song.name)"
+          />
+        </div>
+        <div class="song-info">
+          <p class="song-name">{{ song.name }}</p>
+          <p class="song-permorfer">{{ song.performer }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
