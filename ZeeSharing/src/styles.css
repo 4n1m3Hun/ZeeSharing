@@ -1,15 +1,9 @@
-/* You can add global styles to this file, and also import other style files */
-:root {
-    --color1: #ffffff;
-    --color2: #000000;
-    --color3: #040D12;
-    --color4: #183D3D;
-    --color5: #5C8374;
-    --color6: #93B1A6;
+body{
+    background-color: black;
 }
 font-face {
     font-family: Poppins;
-    src: url(font/Poppins-Light.ttf);
+    src: url(app/assets/Poppins-Light.ttf);
 }
 *{
     margin: 0;

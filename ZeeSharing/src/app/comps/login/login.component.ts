@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -8,32 +8,47 @@ import { sendPasswordResetEmail} from '@angular/fire/auth';
 import { UserService } from '../../user.service';
 import { Firestore, collection,where, doc, setDoc, getDoc, query} from '@angular/fire/firestore';
 
-
 @Component({
   selector: 'app-login',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit{
   email: string = '';
   password: string = '';
   loginError: string = '';
   uname: string = '';
 
-  constructor(private firestore: Firestore, private router: Router, private auth: Auth, private userService: UserService) {}
+  isOnline: boolean = true;
+  
+  private auth = inject(Auth);
+  private firestore = inject(Firestore)
+
+  constructor(private router: Router,private userService: UserService) {
+    
+  }
+  ngOnInit() {
+    this.isOnline = navigator.onLine; // ✅ Ellenőrizd az aktuális állapotot az elején
+    //console.log(this.isOnline ? "🌍 Online" : "🚫 Offline");
+
+    window.addEventListener('online', () => this.updateOnlineStatus(true));
+    window.addEventListener('offline', () => this.updateOnlineStatus(false));
+  }
+  updateOnlineStatus(status: boolean) {
+    this.isOnline = status;
+    //console.log('🌐 Network status changed:', status ? 'Online' : 'Offline');
+  }
 
   async onLogin() {
     try {
       const userCredential = await signInWithEmailAndPassword(this.auth, this.email, this.password);
-      
       const userDocRef = doc(this.firestore, 'Users', this.email)
       const userDocSnapshot = await getDoc(userDocRef);
       if (userDocSnapshot.exists()) {
         const udata = userDocSnapshot.data();
         this.userService.setUserData(userCredential.user, udata['username'],  udata['picture'] , udata['type']);
-      await this.router.navigate(['/dashboard'], { replaceUrl: true });
+        await this.router.navigate(['/main'], { replaceUrl: true });
       }
       
       
@@ -41,10 +56,6 @@ export class LoginComponent {
       this.loginError = 'Wrong email or pasword!';
     }
   }
-  navigateToRegister() {
-    this.router.navigate(['/register']);
-  }
-
   async onForgotPassword() {
     if (!this.email) {
       this.loginError = "Please enter your email address.";
@@ -58,6 +69,10 @@ export class LoginComponent {
       this.loginError = "Failed to send reset email. Please try again.";
     }
   }
+  navigateToRegister() {
+    this.router.navigate(['/register']);
+  }
+  navigateOfflineMain() {
+    this.router.navigate(['/offline-main']);
+  }
 }
-
-

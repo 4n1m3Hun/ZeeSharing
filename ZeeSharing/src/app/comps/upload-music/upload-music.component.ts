@@ -1,4 +1,5 @@
-import { Component,inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+
 import { Storage, ref, getDownloadURL, uploadBytes } from '@angular/fire/storage';
 import { Firestore, collection, doc, setDoc, getDocs, query} from '@angular/fire/firestore';
 import { CommonModule } from '@angular/common';
@@ -8,17 +9,17 @@ import { UserService } from '../../user.service';
 
 import * as mm from 'music-metadata';
 import { encode } from 'base64-arraybuffer';
+
 @Component({
   selector: 'app-upload-music',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './upload-music.component.html',
   styleUrl: './upload-music.component.css'
 })
-export class UploadMusicComponent implements OnInit {
+export class UploadMusicComponent implements OnInit{
   constructor(private firestore: Firestore, private userService: UserService){}
   userData: any = null;
-  
+
   
   selectedFile: File | null = null;
   selectedImg: File | null = null;
@@ -36,16 +37,16 @@ export class UploadMusicComponent implements OnInit {
     await this.fetchTags();
     this.userData = this.userService.getUserData();
     if (this.userData) {
-      console.log('Felhasználó adatai:', this.userData);
+      //console.log('Felhasználó adatai:', this.userData);
     } else {
-      console.log('Nincs bejelentkezett felhasználó!');
+      //console.log('Nincs bejelentkezett felhasználó!');
     }
   }
   async  fetchTags(){
     const tagsCollection = collection(this.firestore, 'Tags');
     const querySnapshot = await getDocs(tagsCollection);
     this.availableTags = querySnapshot.docs.map(docSnapshot => docSnapshot.data()['tag']);
-    console.log(this.availableTags);
+    //console.log(this.availableTags);
   }
   toggleTag(tag: string) {
     const index = this.selectedTags.indexOf(tag);
@@ -67,30 +68,30 @@ export class UploadMusicComponent implements OnInit {
   }
   async onFileUpload(event: Event) {
     event.preventDefault();
-
+  
     if (this.selectedFile) {
       const filePath = `music/${Date.now()}_${this.title}`;
       const storageRef = ref(this.storage, filePath);
-
+  
       try {
-        if(!this.isUpImg){
-          this.extractImageFromMp3(this.selectedFile).then((imgUrl) => {
-            this.imgUrl = imgUrl;
-            console.log(this.imgUrl);
-          });
-        }else{
-          let imgPath = `image/${Date.now()}_${this.title}`;
-          let storageRef2 = ref(this.storage, imgPath);
-          if(this.selectedImg){
-            await uploadBytes(storageRef2, this.selectedImg);
-            this.imgUrl = await getDownloadURL(storageRef2);
-          }
+        // Ha saját képet töltesz fel
+        if (this.isUpImg && this.selectedImg) {
+          const imgPath = `image/${Date.now()}_${this.title}`;
+          const storageRef2 = ref(this.storage, imgPath);
+  
+          await uploadBytes(storageRef2, this.selectedImg);
+          this.imgUrl = await getDownloadURL(storageRef2);
+        } 
+        // Ha NEM saját képet töltesz fel, próbálja meg kinyerni az MP3-ból
+        else {
+          this.imgUrl = await this.extractImageFromMp3(this.selectedFile);
         }
-        
+  
         // Fájl feltöltése Firebase Storage-ba
         await uploadBytes(storageRef, this.selectedFile);
-        //letöltési link
         this.downloadURL = await getDownloadURL(storageRef);
+  
+        // Mentés Firestore-ba
         await setDoc(doc(this.firestore, 'Musics', this.selectedFile.name), {
           audio: this.downloadURL,
           name: this.title,
@@ -99,13 +100,15 @@ export class UploadMusicComponent implements OnInit {
           uploadDate: new Date(),
           performer: this.userData.username
         });
-        console.log('Document created in Firestore successfully.');
+  
+        //console.log('Document created in Firestore successfully.');
       } catch (error) {
-        console.error('A feltöltés meghiúsult:', error);
+        //console.error('A feltöltés meghiúsult:', error);
         this.fileError = 'A feltöltés meghiúsult. Kérlek, próbáld újra.';
       }
     }
   }
+  
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
 
@@ -159,4 +162,5 @@ export class UploadMusicComponent implements OnInit {
       this.fileError = 'Only MP3 files are allowed!';
     }
   }
+
 }

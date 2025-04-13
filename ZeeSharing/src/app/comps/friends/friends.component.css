@@ -1,0 +1,35 @@
+.dot{
+    content: ' ';
+    background-color: red;
+}
+.friend{
+    display: flex;
+    height: fit-content;
+    align-items: center;
+    gap: 1em;
+    position: relative;
+    transition: all 0.3s ease;
+    padding: 1em;
+    border-radius: 10px;
+}
+.friend:hover{
+    background-color: #183D3D;
+    cursor: pointer;
+}
+.img{
+    width: 50px;
+    height: 50px;
+}
+.img img{
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+.friendList{
+    padding-top: 1em;
+}
+fa-icon{
+    font-size: 10px;
+    position: absolute;
+    right: 10px;
+}

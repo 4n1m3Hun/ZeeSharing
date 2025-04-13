@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RecommendedMusicComponent } from './recommended-music.component';
 
+import { RecommendedMusicComponent } from './recommended-music.component';
 
 describe('RecommendedMusicComponent', () => {
   let component: RecommendedMusicComponent;

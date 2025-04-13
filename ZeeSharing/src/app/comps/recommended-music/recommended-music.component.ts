@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { User } from '@angular/fire/auth';
 import { UserService } from '../../user.service';
@@ -17,12 +17,11 @@ export interface Zene {
 
 @Component({
   selector: 'app-recommended-music',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './recommended-music.component.html',
   styleUrl: './recommended-music.component.css'
 })
-export class RecommendedMusicComponent implements OnInit {
+export class RecommendedMusicComponent implements OnInit{
   @Input() latestSongs: Zene[] = [];
   @Output() songClicked = new EventEmitter<{ songs: Zene[]; index: number }>();
 
@@ -87,17 +86,17 @@ export class RecommendedMusicComponent implements OnInit {
     });
 
     if (Object.keys(tagCounts).length === 0) {
-      console.warn("Nincs hallgatási előzmény!");
+      //console.warn("Nincs hallgatási előzmény!");
       return;
     }else{
-      console.warn("Van hallgatási előzmény!");
+      //console.warn("Van hallgatási előzmény!");
     }
     // A legtöbbet hallgatott tagek kiválasztása
     const sortedTags = Object.entries(tagCounts)
     .sort((a, b) => b[1] - a[1]) // Csökkenő sorrendben rendezzük
     .map(entry => entry[0]);
 
-    console.log("Legtöbbet hallgatott tagek:", sortedTags);
+    //console.log("Legtöbbet hallgatott tagek:", sortedTags);
 
     // Zeneajánlás a legtöbbet hallgatott tagek alapján
     const musicCollection = collection(this.firestore, 'Musics');
@@ -135,6 +134,6 @@ export class RecommendedMusicComponent implements OnInit {
     // 🔹 Az egész listát is megkeverjük, hogy ne mindig ugyanabban a sorrendben legyenek a zenék
     this.latestSongs = recommendedSongs.sort(() => Math.random() - 0.5);
   
-    console.log("Ajánlott zenék:", this.latestSongs);
+    //console.log("Ajánlott zenék:", this.latestSongs);
   }
 }

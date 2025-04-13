@@ -1,11 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
-import { User } from '@angular/fire/auth';
-import { UserService } from '../../user.service';
-
 import { Firestore, collection, query, orderBy, limit, getDocs, where } from '@angular/fire/firestore';
-
 import { EventEmitter, Input, Output } from '@angular/core';
 
 export interface Zene {
@@ -18,15 +13,15 @@ export interface Zene {
 
 @Component({
   selector: 'app-popular-music',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './popular-music.component.html',
   styleUrl: './popular-music.component.css'
 })
+
 export class PopularMusicComponent implements OnInit{
   @Input() latestSongs: Zene[] = [];
   @Output() songClicked = new EventEmitter<{ songs: Zene[]; index: number }>();
-  
+
   constructor(
     private firestore: Firestore
   ){}
@@ -34,34 +29,35 @@ export class PopularMusicComponent implements OnInit{
   ngOnInit(): void {
     this.loadPopularMusic();
   }
+
   async onSongSelected(performer: string, name: string) {
-        // this.songClicked.emit(performer);
-        const musicCollection = collection(this.firestore, 'Musics');
-        const filteredQuery = query(musicCollection, where('performer', '==', performer));
-        const musicSnapshot = await getDocs(filteredQuery);
-      
-        // Használj Promise.all-t az await működéséhez
-        const songClicked = await Promise.all(
-          musicSnapshot.docs.map(async (docSnapshot) => {
-            const data = docSnapshot.data();
-            return {
-              name: data['name'],
-              audio: data['audio'],
-              performer: data['performer'],
-              img: data['img'] || 'https://firebasestorage.googleapis.com/v0/b/zeesharing-d33f2.appspot.com/o/image%2Flogo.png?alt=media&token=47edc7c9-f21d-4a55-a106-94df1952689e',
-              tags: data['tags'] || []
-            } as Zene;
-          })
-        );
-      
-        const foundIndex = songClicked.findIndex((song) => song.name === name);
-        // console.clear()
-        // console.log(songClicked);
-        this.songClicked.emit({
-          songs: songClicked,
-          index: foundIndex,
-        });
-    }
+    // this.songClicked.emit(performer);
+    const musicCollection = collection(this.firestore, 'Musics');
+    const filteredQuery = query(musicCollection, where('performer', '==', performer));
+    const musicSnapshot = await getDocs(filteredQuery);
+  
+    // Használj Promise.all-t az await működéséhez
+    const songClicked = await Promise.all(
+      musicSnapshot.docs.map(async (docSnapshot) => {
+        const data = docSnapshot.data();
+        return {
+          name: data['name'],
+          audio: data['audio'],
+          performer: data['performer'],
+          img: data['img'] || 'https://firebasestorage.googleapis.com/v0/b/zeesharing-d33f2.appspot.com/o/image%2Flogo.png?alt=media&token=47edc7c9-f21d-4a55-a106-94df1952689e',
+          tags: data['tags'] || []
+        } as Zene;
+      })
+    );
+  
+    const foundIndex = songClicked.findIndex((song) => song.name === name);
+    // console.clear()
+    // console.log(songClicked);
+    this.songClicked.emit({
+      songs: songClicked,
+      index: foundIndex,
+    });
+  }
 
   async loadPopularMusic() {
     const playHistoryCollection = collection(this.firestore, 'PlayHistory');
@@ -73,31 +69,31 @@ export class PopularMusicComponent implements OnInit{
     const historySnapshot = await getDocs(historyQuery);
 
     const songCounts: Record<string, { count: number; data: Zene }> = {};
-    
+
     historySnapshot.docs.forEach(docSnapshot => {
       const data = docSnapshot.data();
       const songKey = `${data['name']} - ${data['performer']}`;
-  
-      if (!songCounts[songKey]) {
-        songCounts[songKey] = {
-          count: 0,
-          data: {
-            name: data['name'],
-            audio: data['audio'],
-            performer: data['performer'],
-            img: data["img"] || 'https://firebasestorage.googleapis.com/v0/b/zeesharing-d33f2.appspot.com/o/image%2Flogo.png?alt=media&token=47edc7c9-f21d-4a55-a106-94df1952689e',
-            tags: data['tags'] || []
-          }
-        };
-      }
-      songCounts[songKey].count += 1;
-    });
 
-    this.latestSongs = Object.values(songCounts)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 6)
-    .map(entry => entry.data);
+    if (!songCounts[songKey]) {
+      songCounts[songKey] = {
+        count: 0,
+        data: {
+          name: data['name'],
+          audio: data['audio'],
+          performer: data['performer'],
+          img: data["img"] || 'https://firebasestorage.googleapis.com/v0/b/zeesharing-d33f2.appspot.com/o/image%2Flogo.png?alt=media&token=47edc7c9-f21d-4a55-a106-94df1952689e',
+          tags: data['tags'] || []
+        }
+      };
+    }
+    songCounts[songKey].count += 1;
+  });
 
-    console.log("Legnépszerűbb zenék az elmúlt héten:", this.latestSongs);
+  this.latestSongs = Object.values(songCounts)
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 6)
+  .map(entry => entry.data);
+
+  //console.log("Legnépszerűbb zenék az elmúlt héten:", this.latestSongs);
   }
 }

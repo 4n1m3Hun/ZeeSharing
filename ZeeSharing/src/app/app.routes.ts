@@ -1,14 +1,15 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './comps/auth/auth.guard';
+import { MainComponent } from './comps/main/main.component';
 import { LoginComponent } from './comps/login/login.component';
-import { DashboardComponent } from './comps/dashboard/dashboard.component';
 import { RegisterComponent } from './comps/register/register.component';
-import { AuthGuard } from './auth.guard';
+import { OfflineMainComponent } from './comps/offline-main/offline-main.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: 'register', component: RegisterComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login' }
+    { path: '', component: LoginComponent },
+    { path: 'login', component: LoginComponent },
+    { path: 'register', component: RegisterComponent },
+    { path: 'offline-main', component: OfflineMainComponent },
+    { path: 'main', component: MainComponent, canActivate: [AuthGuard] },
 ];
 

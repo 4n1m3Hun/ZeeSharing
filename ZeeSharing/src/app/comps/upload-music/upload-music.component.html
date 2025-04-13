@@ -6,7 +6,7 @@
       <br>
       <input type="file" id="ImgInput" accept=".png, .jpg, .jpeg" (change)="onImgSelected($event)" class="hidden-file-input" />
       <div class="buttons">
-        <button class="imgBtn" (click)="toggleisUpImg()">képet feltölteni</button><br>
+        <button class="imgBtn" (click)="toggleisUpImg()">Upload Image</button><br>
         <button
           [id]="!selectedFile ? 'not' : ''" 
           type="submit" [disabled]="!selectedFile">Upload

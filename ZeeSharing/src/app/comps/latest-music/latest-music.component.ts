@@ -2,11 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Firestore, collection, query, orderBy, limit, getDocs, where, addDoc } from '@angular/fire/firestore';
 import { NgFor } from '@angular/common';
 import { Buffer } from 'buffer';
-import * as mm from 'music-metadata';
+//import * as mm from 'music-metadata';
 
 import { EventEmitter, Input, Output } from '@angular/core';
 
-//zene típus
 export interface Zene {
   name: string;
   audio: string;
@@ -17,13 +16,11 @@ export interface Zene {
 
 @Component({
   selector: 'app-latest-music',
-  templateUrl: './latest-music.component.html',
   standalone: true,
   imports: [NgFor],
-  styleUrls: ['./latest-music.component.css']
+  templateUrl: './latest-music.component.html',
+  styleUrl: './latest-music.component.css'
 })
-
-
 export class LatestMusicComponent implements OnInit {
   @Input() latestSongs: Zene[] = [];
   @Output() songClicked = new EventEmitter<{ songs: Zene[]; index: number }>();

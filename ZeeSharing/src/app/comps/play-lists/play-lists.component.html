@@ -1,28 +1,25 @@
-<div class="all">
-    <div *ngFor="let list of userPlaylists" class="playList">
-        <span>{{list.title}}</span>
+<div *ngFor="let list of userPlaylists" class="playList">
+    <div class="head">
+        <span>{{ list.title }}</span>
         <div class="icons">
             <fa-icon [icon]="faEye" [id]="list.type === 'private' ? 'red' : (list.type === 'public' ? 'green' : 'yellow')"></fa-icon>
-            <button><fa-icon [icon]="faArrowDown"></fa-icon></button>
+            <button (click)="toggleMusicVisibility(list.title)"><fa-icon [icon]="list.showMusics ? faArrowUp : faArrowDown"></fa-icon></button>
         </div>
-        <!--<img
-            [src]="song.img"
-            alt="{{ song.name }}"
-            class="song-image"
-            (click)="onSongSelected(song.performer, song.name)"
-          />
-          <fa-icon [icon]="volume > 0.5 ? faVolumeHigh : volume > 0 ? faVolumeLow : faVolumeXmark"-->
     </div>
-    <div class="playList">
-        <span>Dowloded Musics</span>
-        <div class="icons">
-            <fa-icon [icon]="faEye" id="red"></fa-icon>
-            <button><fa-icon [icon]="faArrowDown"></fa-icon></button>
-        </div>
-        <br>
-        <div *ngFor="let list of downloadedMusic" >
-            {{list}} <br>
+    <div class="musics" *ngIf="list.showMusics">
+        <div class="mus" *ngFor="let music of list.songs; let i = index ">
+            <div class="listItems">
+                <div class="item" (click)="onSongSelected(list.title, i)">
+                  <div class="img">
+                    <img [src]="music.img" alt="Now Playing Image" class="">
+                  </div>
+                  <div class="data">
+                    <span>{{ music.name }}</span>
+                    <span class="performer">{{ music.performer }}</span>
+                  </div>
+                </div>
+                <button (click)="deleteFromPlayList(list.title, music)"><fa-icon [icon]="faTrashCan"></fa-icon></button>
+            </div>
         </div>
     </div>
 </div>
-

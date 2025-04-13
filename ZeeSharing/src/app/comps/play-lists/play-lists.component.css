@@ -1,22 +1,15 @@
-:root {
-    --color1: #ffffff;
-    --color2: #000000;
-    --color3: #040D12;
-    --color4: #183D3D;
-    --color5: #5C8374;
-    --color6: #93B1A6;
+.img{
+    width: 100px;
+    height: 100px;
 }
-
+.img img{
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
 fa-icon{
     font-size: 1em;
     color: white;
-}
-.playList{
-    display: flex;
-    justify-content: space-between;
-    margin: 0 14px;
-    padding: 1em;
-    border-bottom: 1px solid var(--color5);
 }
 #red{
     color: rgb(121,0,10);
@@ -30,10 +23,59 @@ fa-icon{
 button{
     margin-left: 15px;
     background-color: transparent;
-    color: var(--color1);
+    color: white;
     cursor: pointer;
     border: none;
 }
-.all{
-    padding-top: 1em;
+.playList{
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0px;
+    border-bottom: 1px solid #183D3D;
+}
+.playList .head{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.musics{
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    margin-top: 1em;
+    width: 100%;
+}
+.musics .mus{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.listItems {
+    width: 100%;
+    position: relative;
+}
+
+.listItems .item {
+    width: 100%;
+    display: flex;
+    flex: 1;
+    cursor: pointer;
+    gap: 1em;
+    transition: all 0.3s ease;
+}
+.listItems .item:hover {
+    background-color: rgba(24, 61, 61, 0.1);
+}
+.data{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.performer{
+    color: #183D3D;
+}
+.listItems button{
+    position: absolute;
+    right: 15px;
+    top: 20px;
 }

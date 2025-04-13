@@ -8,7 +8,6 @@ import { signInWithEmailAndPassword } from '@angular/fire/auth';
 import { Firestore, collection, addDoc, doc, setDoc } from '@angular/fire/firestore';
 import { isEmpty } from 'rxjs';
 
-
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -62,3 +61,4 @@ export class RegisterComponent {
     this.router.navigate(['/login']);
   }
 }
+

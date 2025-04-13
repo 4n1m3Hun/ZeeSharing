@@ -1,0 +1,240 @@
+:root {
+    --color1: #ffffff;
+    --color2: #000000;
+    --color3: #040D12;
+    --color4: #183D3D;
+    --color5: #5C8374;
+    --color6: #93B1A6;
+}
+.search{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.search input{
+    width: 70%;
+    height: 45px;
+    font-size: 25px;
+    background-color: #183D3D;
+    border-radius: 0 10px 10px 0;
+    border: none;
+    color: #ffffff;
+    padding-left: 1em;
+}
+.search input:focus {
+    outline: none; 
+    border: none;
+  }
+.search span{
+    background-color: #183D3D;
+    border-radius: 10px 0 0 10px;
+    height: 45px;
+    width: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+fa-icon {
+    font-size: 25px;
+}
+.research{
+    position: relative;
+}
+.searchResults{
+    position: absolute;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    top: 55px;
+}
+.results{
+    background-color: rgba(0,0,0,0.4);
+    padding: 1em;
+    width: 70%;
+    border-radius: 10px;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px;
+}
+.result{
+    flex-basis: 200;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    border-radius: 1em;
+    margin: 1em;
+    min-width: fit-content;
+}
+ul{
+    list-style: none;
+}
+.result li{
+    cursor: pointer;
+}
+.performer{
+    padding-top: 2em;
+}
+.performer_img{
+    width: 250px;
+    height: 250px;
+}
+.performer_img img{
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+}
+.performer_data{
+    display: flex;
+    gap: 2em;
+    position: relative;
+}
+.performer_data .data span{
+    color: #183D3D;
+}
+.performer_musics{
+    margin-top: 3em;
+}
+.performer_musics .musics{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+.performer_musics .musics div{
+    flex-basis: 200;
+    border-radius: 1em;
+    width: 30%;
+}
+.performer_musics h2, .tag_musics h2{
+    margin: 1em 0;
+}
+.musics .music{
+    padding: 0.5em;
+    transition: all 0.3s ease;
+}
+.musics .mu{
+    display: flex;
+    gap: 1em;
+}
+.musics .music .img{
+    width: 100px;
+    height: 100px;
+}
+.musics .music .img img{
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+.musics .music:hover{
+    background-color: #183D3D;
+    cursor: pointer;
+}
+.performer_data .data{
+    position: relative;
+}
+.buttons{
+    position: absolute;
+    bottom: 1em;
+    left: 1em;
+    display: flex;
+    gap:1em;
+}
+.buttons button{
+    min-width: 100px;
+    padding: 1em 0.5em;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #183D3D;
+    border: none;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+.buttons button:hover{
+    background-color: #5C8374;
+}
+.performer .data h2{
+    margin-bottom: 1em;
+}
+.performer .data p span{
+    color: #5C8374;
+}
+.musics .data{
+    min-width: 100%;
+}
+.musics .mu .img{
+    width: 100px;
+}
+.musics .mu .data{
+    min-width: 100%;
+}
+.tag_musics .musics{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+.tag_musics .musics div{
+    flex-basis: 200;
+    border-radius: 1em;
+    width: 40%;
+}
+.user_lists{
+    width: 50%;
+}
+.user_list{
+    width: 100%;
+    margin-top: 1em;
+    border-bottom: 1px solid #5C8374;
+}
+.user_list .head{
+    display: flex;
+    justify-content: space-between;
+}
+.user_list .head .buttons button{
+    margin-right: 1em;
+}
+.user_follow{
+    min-width: 100px;
+    background-color: transparent;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.user_follow:hover{
+    color: #5C8374;
+}
+.list_icon{
+    background-color: transparent;
+    color: #ffffff;
+    border: none;
+    font-size: 10px;
+}
+.list_icon fa-icon{
+    font-size: 15px;
+    cursor: pointer;
+}
+.user_musics, .user_musics .musics, .user_musics .musics .music{
+    width: 100%;
+}
+.user_musics .musics .music .mu{
+    width: 100%;
+    display: flex;
+}
+.user_musics .musics .music .mu .mu_data{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.mu .mu_img{
+    width: 100px;
+    height: 100px;
+}
+.mu .mu_img img{
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+.perfor{
+    color: #183D3D;
+}

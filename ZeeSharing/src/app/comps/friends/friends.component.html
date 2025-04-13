@@ -1,0 +1,11 @@
+<div class="friendList">
+    <div *ngFor="let friend of friends_data">
+        <div class="friend" (click)="friendClicked(friend.username)">
+            <div class="img">
+                <img [src]="friend.img" alt="Now Playing Image" class=""/>
+            </div>
+            <span>{{ friend.username }}</span>
+            <fa-icon [icon]="faCircle"></fa-icon>
+        </div>
+    </div>
+</div>

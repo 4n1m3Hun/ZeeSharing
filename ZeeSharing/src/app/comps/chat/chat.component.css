@@ -1,0 +1,169 @@
+.chat-container{
+  min-height: 100%;
+}
+.chat{
+  min-height: 530px;
+  max-height: 530px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.chat::-webkit-scrollbar{
+  width: 0;
+}
+h1{
+  width: 100%;
+  border-bottom: 1px solid #183D3D;
+  margin-bottom: 1em;
+}
+.chat .msgs{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.me{
+  width: 100%;
+  display: flex;
+  justify-content: end;
+}
+.them{
+  width: 100%;
+  display: flex;
+  justify-content: start;
+}
+.me .msg{
+  max-width: 60%;
+  text-align: justify;
+}
+.them .msg{
+  max-width: 60%;
+  text-align: justify;
+}
+.msg .img img{
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.me .m{
+  background-color: #183D3D;
+  padding: 1em;
+  border-radius: 15px 15px 0px 15px;
+}
+.them .m{
+  background-color: #183D3D;
+  padding: 1em;
+  border-radius: 15px 15px 15px 0px;
+}
+.msg{
+  display: flex;
+  gap: 1em;
+  min-height: 50px;
+}
+.img{
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+}
+.msgType{
+  display: flex;
+  flex-direction: column;
+}
+.time{
+  font-size: 15px;
+  color: black;
+}
+.me .m .time{
+  text-align: right;
+}
+.chat-input{
+  padding-top: 2em;
+  width: 100%;
+  position: relative;
+}
+.chat-input input{
+  padding: 1em;
+  border: none;
+  color: #ffffff;
+  padding-left: 1em;
+}
+.chat-input input:focus {
+  outline: none; 
+  border: none;
+}
+.chat-input button{
+  width: 50px;
+  height: 42px;
+  background-color: #183D3D;
+  border: none;
+  cursor: pointer;
+}
+.last{
+  border-radius: 0 10px 10px 0;
+}
+.chat-input fa-icon{
+  color: #ffffff;
+}
+.tyMus{
+  background-color: #183D3D;
+  border-radius: 10px 0 0 10px;
+  width: calc(100% - 150px);
+}
+.se{
+  position: absolute;
+  top: -100px;
+  width: calc(100% - 150px);
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 1em;
+  border-radius: 10px;
+}
+.seMusc{
+  width: 100%;
+  border-radius: 10px;
+  width: 200px;
+  margin-top: 1em;
+  background-color: transparent;
+  border: 1px solid white;
+}
+.result{
+  background-color: rgba(0, 0, 0, 0.9);
+}
+.music{
+  display: flex;
+  gap: 10px;
+  min-width: 300px;
+}
+.music .msg-img{
+  width: 100px;
+  height: 100px;
+}
+.music .msg-img img{
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+.music_data{
+  width: 100%;
+}
+.bottom{
+  width: 100%;
+  text-align: right;
+}
+.music_data .top{
+  height: 66%;
+}
+.bottom button{
+  height: 30px;
+  width: 30px;
+  background-color: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.bottom button fa-icon{
+  font-size: 30px;
+}
+.bottom button:hover{
+  color: #5C8374;
+}
