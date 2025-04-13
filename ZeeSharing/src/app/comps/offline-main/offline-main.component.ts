@@ -20,15 +20,13 @@ export class OfflineMainComponent implements OnInit {
   }
 
   async loadMusic() {
-    // Növeljük a verziót, hogy biztosan lefusson az onupgradeneeded
-    const request = indexedDB.open("MusicDatabase", 2); // Verzió növelése
+    const request = indexedDB.open("MusicDatabase", 2);
   
     request.onupgradeneeded = (event: any) => {
       const db = event.target.result;
   
-      // Ha még nem létezik, létrehozzuk a 'songs' objektum tárolót
       if (!db.objectStoreNames.contains('songs')) {
-        db.createObjectStore('songs', { keyPath: 'id' }); // vagy más kulcsmező, ha szükséges
+        db.createObjectStore('songs', { keyPath: 'id' });
         //console.log("Létrehozva a 'songs' tároló.");
       }
     };
@@ -36,13 +34,13 @@ export class OfflineMainComponent implements OnInit {
     request.onsuccess = (event: any) => {
       const db = event.target.result;
       
-      // Készítsünk tranzakciót a 'songs' tárolóval
+      
       const transaction = db.transaction("songs", "readonly");
       const store = transaction.objectStore("songs");
       const getAllRequest = store.getAll();
   
       getAllRequest.onsuccess = () => {
-        this.musicFiles = getAllRequest.result; // Betölti a zenéket a tömbbe
+        this.musicFiles = getAllRequest.result;
         //console.log("Betöltött zenék:", this.musicFiles);
       };
   

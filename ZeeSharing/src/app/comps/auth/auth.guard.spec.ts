@@ -1,18 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { CanActivate } from '@angular/router';
-import { AuthGuard } from './auth.guard'; // Használj AuthGuard-ot
+import { AuthGuard } from './auth.guard';
 
 describe('AuthGuard', () => {
   let guard: AuthGuard;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AuthGuard], // AuthGuard hozzáadása a teszteléshez
+      providers: [AuthGuard],
     });
-    guard = TestBed.inject(AuthGuard); // AuthGuard injektálása
+    guard = TestBed.inject(AuthGuard);
   });
 
   it('should be created', () => {
-    expect(guard).toBeTruthy(); // Ellenőrizd, hogy a guard létrejön
+    expect(guard).toBeTruthy();
   });
 });

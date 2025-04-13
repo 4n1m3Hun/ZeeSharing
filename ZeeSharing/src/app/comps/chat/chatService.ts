@@ -15,7 +15,6 @@ export class ChatService {
 
   constructor(private firestore: Firestore) {}
 
-  // 🔹 Üzenet küldése Firestore-ba
   async sendMessage(sender: string, receiver: string, message: string) {
     const messagesCollection = collection(this.firestore, 'messages');
 
@@ -41,11 +40,9 @@ export class ChatService {
     });
   }
 
-  // 🔹 Üzenetek lekérése real-time frissítéssel
   listenForMessages(sender: string, receiver: string) {
     const messagesCollection = collection(this.firestore, 'messages');
 
-    // Lekérjük az üzeneteket a két felhasználó között
     const messagesQuery = query(
       messagesCollection,
       where('sender', 'in', [sender, receiver]),
@@ -53,7 +50,6 @@ export class ChatService {
       orderBy('time', 'asc')
     );
 
-    // Real-time figyelés az üzenetekre
     return onSnapshot(
       messagesQuery,
       (snapshot) => {
@@ -87,15 +83,14 @@ export class ChatService {
     );
   }
 
-  // 🔹 Üzenetek olvasottnak jelölése
   async markMessagesAsSeen(sender: string, receiver: string) {
     const messagesCollection = collection(this.firestore, 'messages');
 
     const messagesQuery = query(
       messagesCollection,
-      where('sender', '==', receiver), // A fogadott üzenetek
-      where('receiver', '==', sender), // A jelenlegi felhasználónak szólnak
-      where('seen', '==', false) // Csak a még nem olvasottak
+      where('sender', '==', receiver),
+      where('receiver', '==', sender), 
+      where('seen', '==', false) 
     );
 
     const snapshot = await getDocs(messagesQuery);

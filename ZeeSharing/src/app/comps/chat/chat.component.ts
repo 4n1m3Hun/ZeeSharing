@@ -69,14 +69,10 @@ export class ChatComponent implements OnInit, OnDestroy {
         
         if(this.receiver){
           console.log(this.receiver);
-          // 🔹 Csak akkor indítjuk el a hallgatást, amikor már megvan a receiver
           this.chatService.listenForMessages(this.sender, this.receiver);
-              
-          // 🔹 Olvasottnak jelölés is itt történjen
           this.chatService.markMessagesAsSeen(this.sender, this.receiver);
         }
       });
-      // 🔹 Megfigyelés az üzenetek Observable-re
       this.messagesSub = this.chatService.messages$.subscribe(messages => {
         this.messages = messages;
         this.cdref.detectChanges();

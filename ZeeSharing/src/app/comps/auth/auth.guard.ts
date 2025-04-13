@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { Auth } from '@angular/fire/auth'; // Firebase auth importálása
+import { Auth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -10,16 +10,16 @@ import { map } from 'rxjs/operators';
 })
 export class AuthGuard implements CanActivate {
 
-  private auth = inject(Auth); // Auth injectálása
-  private router = inject(Router); // Router injectálása
+  private auth = inject(Auth);
+  private router = inject(Router);
 
   canActivate(): Observable<boolean> {
     return new Observable<boolean>((observer) => {
       const unsubscribe = this.auth.onAuthStateChanged((user) => {
         if (user) {
-          observer.next(true); // Ha be van jelentkezve, engedélyezzük az útvonalat
+          observer.next(true);
         } else {
-          this.router.navigate(['/login']); // Ha nincs bejelentkezve, átirányítás a login oldalra
+          this.router.navigate(['/login']);
           observer.next(false);
         }
         observer.complete();

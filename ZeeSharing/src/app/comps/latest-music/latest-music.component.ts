@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Firestore, collection, query, orderBy, limit, getDocs, where, addDoc } from '@angular/fire/firestore';
 import { NgFor } from '@angular/common';
 import { Buffer } from 'buffer';
-//import * as mm from 'music-metadata';
 
 import { EventEmitter, Input, Output } from '@angular/core';
 
@@ -26,12 +25,10 @@ export class LatestMusicComponent implements OnInit {
   @Output() songClicked = new EventEmitter<{ songs: Zene[]; index: number }>();
 
   async onSongSelected(performer: string, name: string) {
-    // this.songClicked.emit(performer);
     const musicCollection = collection(this.firestore, 'Musics');
     const filteredQuery = query(musicCollection, where('performer', '==', performer));
     const musicSnapshot = await getDocs(filteredQuery);
   
-    // Használj Promise.all-t az await működéséhez
     const songClicked = await Promise.all(
       musicSnapshot.docs.map(async (docSnapshot) => {
         const data = docSnapshot.data();

@@ -13,9 +13,9 @@ import { FormsModule } from '@angular/forms';
 export class CreatePlayListComponent implements OnInit{
 
   userData: any = null;
-  playlistName: string = ''; // Az űrlap neve
-  playlistType: string = ''; // Az űrlap típusa
-  errorMessage: string = ''; // Hibaüzenet, ha már létezik
+  playlistName: string = '';
+  playlistType: string = '';
+  errorMessage: string = '';
 
   constructor(private userService: UserService, private firestore: Firestore) {}
 

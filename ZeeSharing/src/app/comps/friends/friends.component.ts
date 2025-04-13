@@ -37,20 +37,20 @@ export class FriendsComponent implements OnInit{
   async getFriends() {
     const friendListsCollection = collection(this.firestore, 'Friends');
   
-    // Első lekérdezés (User1)
+    
     const friendListsQuery1 = query(friendListsCollection, where('User1', '==', this.userData['username']), where('type', '==', 'friend'));
     const friendSnapshot1 = await getDocs(friendListsQuery1);
   
-    // Második lekérdezés (User2)
+    
     const friendListsQuery2 = query(friendListsCollection, where('User2', '==', this.userData['username']), where('type', '==', 'friend'));
     const friendSnapshot2 = await getDocs(friendListsQuery2);
   
-    // Adatok összefűzése (elkerülve a duplikációkat)
+    
     const friends: any[] = [];
     [...friendSnapshot1.docs, ...friendSnapshot2.docs].forEach(doc => {
       const friendData = doc.data();
     
-      // Ellenőrizni kell, hogy már benne van-e a tömbben
+      
       if (!friends.some(f => f.username === friendData["User1"])) {
         friends.push(friendData);
       }
@@ -64,7 +64,7 @@ export class FriendsComponent implements OnInit{
       const querySnapshot = await getDocs(friendListsQuery1);
       
       if (!querySnapshot.empty) {
-        const docSnapshot = querySnapshot.docs[0]; // Az első dokumentum kiválasztása
+        const docSnapshot = querySnapshot.docs[0];
         this.friends_data.push({
           username: docSnapshot.data()['username'],
           img: docSnapshot.data()['img']
