@@ -36,7 +36,6 @@ export class PopularMusicComponent implements OnInit{
     const filteredQuery = query(musicCollection, where('performer', '==', performer));
     const musicSnapshot = await getDocs(filteredQuery);
   
-    // Használj Promise.all-t az await működéséhez
     const songClicked = await Promise.all(
       musicSnapshot.docs.map(async (docSnapshot) => {
         const data = docSnapshot.data();

@@ -252,7 +252,6 @@ export class SearchComponent {
     const followSnapshot = await getDocs(followQuery);
   
     if (action === 1) {
-      // **Követés hozzáadása**
       if (followSnapshot.empty) {
         await addDoc(followCollection, {
           performer: performer,
@@ -262,10 +261,9 @@ export class SearchComponent {
         this.isFollow = true;
       }
     } else {
-      // **Követés törlése**
+
       if (!followSnapshot.empty) {
         followSnapshot.forEach(async (docSnap) => {
-          // Dokumentum törlése
           await deleteDoc(doc(this.firestore, 'Follows', docSnap.id));
         });
         this.isFollow = false;

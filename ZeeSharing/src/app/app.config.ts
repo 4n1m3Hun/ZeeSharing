@@ -32,7 +32,7 @@ export const appConfig: ApplicationConfig = {
                 provideFirestore(() => getFirestore()),
                 provideAuth(() => getAuth()),
                 provideStorage(() => getStorage()),
-                provideHttpClient(),// Add hozzá az HttpClient szolgáltatást
+                provideHttpClient(),
                 AuthGuard
               ]
 };

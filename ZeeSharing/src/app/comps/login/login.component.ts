@@ -29,15 +29,15 @@ export class LoginComponent implements OnInit{
     
   }
   ngOnInit() {
-    this.isOnline = navigator.onLine; // ✅ Ellenőrizd az aktuális állapotot az elején
-    //console.log(this.isOnline ? "🌍 Online" : "🚫 Offline");
+    this.isOnline = navigator.onLine;
+    //console.log(this.isOnline ? " Online" : " Offline");
 
     window.addEventListener('online', () => this.updateOnlineStatus(true));
     window.addEventListener('offline', () => this.updateOnlineStatus(false));
   }
   updateOnlineStatus(status: boolean) {
     this.isOnline = status;
-    //console.log('🌐 Network status changed:', status ? 'Online' : 'Offline');
+    //console.log(' Network status changed:', status ? 'Online' : 'Offline');
   }
 
   async onLogin() {

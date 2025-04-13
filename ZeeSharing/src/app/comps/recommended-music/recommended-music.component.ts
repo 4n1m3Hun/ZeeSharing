@@ -42,7 +42,7 @@ export class RecommendedMusicComponent implements OnInit{
       const filteredQuery = query(musicCollection, where('performer', '==', performer));
       const musicSnapshot = await getDocs(filteredQuery);
     
-      // Használj Promise.all-t az await működéséhez
+      
       const songClicked = await Promise.all(
         musicSnapshot.docs.map(async (docSnapshot) => {
           const data = docSnapshot.data();
@@ -73,7 +73,7 @@ export class RecommendedMusicComponent implements OnInit{
     const historyQuery = query(playHistoryCollection, where('user', '==', this.userData?.email));
     const historySnapshot = await getDocs(historyQuery);
 
-    // Összesített tag-előfordulás számláló
+    
     const tagCounts: Record<string, number> = {};
 
     historySnapshot.docs.forEach(docSnapshot => {
@@ -91,19 +91,19 @@ export class RecommendedMusicComponent implements OnInit{
     }else{
       //console.warn("Van hallgatási előzmény!");
     }
-    // A legtöbbet hallgatott tagek kiválasztása
+    
     const sortedTags = Object.entries(tagCounts)
-    .sort((a, b) => b[1] - a[1]) // Csökkenő sorrendben rendezzük
+    .sort((a, b) => b[1] - a[1])
     .map(entry => entry[0]);
 
     //console.log("Legtöbbet hallgatott tagek:", sortedTags);
 
-    // Zeneajánlás a legtöbbet hallgatott tagek alapján
+   
     const musicCollection = collection(this.firestore, 'Musics');
     let recommendedSongs: Zene[] = [];
 
     for (const tag of sortedTags) {
-      if (recommendedSongs.length >= 6) break; // Ha már van 6 ajánlott dal, megállunk
+      if (recommendedSongs.length >= 6) break;
   
       const tagQuery = query(musicCollection, where('tags', 'array-contains', tag));
       const musicSnapshot = await getDocs(tagQuery);
@@ -119,19 +119,17 @@ export class RecommendedMusicComponent implements OnInit{
         };
       });
   
-      // 🔹 Véletlenszerű sorrendbe keverjük az adott taghez tartozó zenéket
       tagSongs = tagSongs.sort(() => Math.random() - 0.5);
   
-      // 🔹 Hozzáadjuk az ajánlásokhoz, amíg el nem érjük a 6-os limitet
+      
       for (const song of tagSongs) {
         if (recommendedSongs.length >= 6) break;
-        if (!recommendedSongs.some(s => s.name === song.name)) { // Elkerüljük a duplikációt
+        if (!recommendedSongs.some(s => s.name === song.name)) {
           recommendedSongs.push(song);
         }
       }
     }
 
-    // 🔹 Az egész listát is megkeverjük, hogy ne mindig ugyanabban a sorrendben legyenek a zenék
     this.latestSongs = recommendedSongs.sort(() => Math.random() - 0.5);
   
     //console.log("Ajánlott zenék:", this.latestSongs);

@@ -68,7 +68,7 @@ export class PlayListsComponent implements OnInit{
   toggleMusicVisibility(title: string) {
     const playlist = this.userPlaylists.find(list => list.title === title);
     if (playlist) {
-        playlist.showMusics = !playlist.showMusics; // Toggle the visibility
+        playlist.showMusics = !playlist.showMusics;
     }
   }
 
@@ -94,21 +94,21 @@ export class PlayListsComponent implements OnInit{
       const querySnapshot = await getDocs(playlistsQuery);
 
       if (!querySnapshot.empty) {
-        const playlistDoc = querySnapshot.docs[0]; // Feltételezzük, hogy egyetlen találat van
+        const playlistDoc = querySnapshot.docs[0];
         const playlistRef = playlistDoc.ref;
         const playlistData = playlistDoc.data();
   
-        // Frissített dalok lista (töröljük a megadott dalt)
+        
         const updatedSongs = (playlistData['songs'] || []).filter(
           (s: Zene) => s.audio !== song.audio
         );
   
-        // Firestore frissítése
+        
         await updateDoc(playlistRef, {
           songs: updatedSongs
         });
   
-        // Helyi állapot frissítése
+        
         const playlistIndex = this.userPlaylists.findIndex(p => p.title === title);
         if (playlistIndex !== -1) {
           this.userPlaylists[playlistIndex].songs = updatedSongs;

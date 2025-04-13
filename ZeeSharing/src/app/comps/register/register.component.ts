@@ -38,7 +38,7 @@ export class RegisterComponent {
         await setDoc(userDocRef, {
           type: this.ac_type,
           username: this.u_name,
-            picture: 'default.png' // Ha alapértelmezett képet használsz, ezt módosíthatod
+            picture: 'default.png'
         });
 
         const userCredential2 = await signInWithEmailAndPassword(this.auth, this.email, this.password);
@@ -47,7 +47,6 @@ export class RegisterComponent {
         this.registerError = "The two passwords are not the same!";
       }
     } catch (error: any) {
-      // Ellenőrzés, hogy az e-mail cím már létezik-e
       if (error.code === 'auth/email-already-in-use') {
         this.registerError = 'This email address is already in use!';
       } else {

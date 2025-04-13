@@ -80,7 +80,6 @@ export class MainComponent implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy(): void {
-    // 🔹 Memóriaszivárgás elkerülése
     this.messagesSub?.unsubscribe();
   }
 
@@ -154,7 +153,7 @@ export class MainComponent implements OnInit, OnDestroy {
     };
     const playHistoryCollection = collection(this.firestore, 'PlayHistory');
     addDoc(playHistoryCollection, {
-      user: this.userData?.email, // Bejelentkezett felhasználó e-mail címe
+      user: this.userData?.email,
       name: this.currentMusic.name,
       performer: this.currentMusic.performer,
       tags: this.currentMusic.tags || [],
@@ -163,7 +162,6 @@ export class MainComponent implements OnInit, OnDestroy {
     });
   }
   playSongAndContinue(song: Zene) {
-    // Beállítjuk a lejátszott zenét
     this.currentMusic = song;
   
     if (!this.audioPlayer) {
@@ -294,8 +292,6 @@ export class MainComponent implements OnInit, OnDestroy {
       const db = await this.openDatabase();
       const transaction = db.transaction("songs", "readwrite");
       const store = transaction.objectStore("songs");
-
-      // Az objektum, amit el szeretnél tárolni
       const song = {
         name: zene.name,
         performer: zene.performer,
@@ -311,12 +307,11 @@ export class MainComponent implements OnInit, OnDestroy {
 
   openDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("MusicDatabase", 2); // Verzió frissítése
+      const request = indexedDB.open("MusicDatabase", 2);
 
       request.onupgradeneeded = function (event) {
         const db = (event.target as IDBOpenDBRequest).result;
 
-        // Ellenőrizzük, hogy létezik-e már az objektumtároló
         if (!db.objectStoreNames.contains("songs")) {
           db.createObjectStore("songs", { keyPath: "name" });
         }
@@ -335,8 +330,8 @@ export class MainComponent implements OnInit, OnDestroy {
   /*lilépés*/
   async logout() {
     try {
-      await signOut(this.auth); // Kijelentkezés
-      this.router.navigate(['/login'], { replaceUrl: true }); // Vissza a Login oldalra
+      await signOut(this.auth);
+      this.router.navigate(['/login'], { replaceUrl: true });
     } catch (error) {
       //console.error('Error during logout:', error);
     }
