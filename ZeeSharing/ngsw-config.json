@@ -21,7 +21,7 @@
       "updateMode": "prefetch",
       "resources": {
         "files": [
-           "/assets/**"
+          "/assets/**"
         ]
       }
     }
@@ -37,6 +37,18 @@
         "maxAge": "1d",
         "timeout": "10s",
         "strategy": "performance"
+      }
+    },
+    {
+      "name": "firestore-api",
+      "urls": [
+        "https://firestore.googleapis.com/**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 0,
+        "maxAge": "0u",
+        "timeout": "0u"
       }
     }
   ]

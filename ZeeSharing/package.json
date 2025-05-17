@@ -30,6 +30,7 @@
     "firebase-admin": "^13.3.0",
     "music-metadata": "^11.0.2",
     "ng2-charts": "^4.1.1",
+    "pwa": "^1.9.7",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
