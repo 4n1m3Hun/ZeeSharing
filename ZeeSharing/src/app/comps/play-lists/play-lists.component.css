@@ -1,81 +1,162 @@
-.img{
-    width: 100px;
-    height: 100px;
+.playList,
+.followList {
+    padding: 1em;
 }
-.img img{
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
+
+#follow {
+    margin-top: 2em;
 }
-fa-icon{
-    font-size: 1em;
-    color: white;
+
+.head {
+    display: flex;
+    justify-content: space-between;
 }
-#red{
-    color: rgb(121,0,10);
+
+.head span {
+    font-weight: bold;
+    font-size: 1.2em;
 }
-#yellow{
-    color: rgb(156,159,0);
+
+.icons {
+    display: flex;
+    gap: 1.5em;
+    font-size: 1.2em;
 }
-#green{
-    color: rgb(8,121,0);
-}
-button{
-    margin-left: 15px;
-    background-color: transparent;
-    color: white;
+
+.icons fa-icon {
     cursor: pointer;
+}
+
+.icons button {
+    background-color: transparent;
     border: none;
+    color: #ffffff;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
-.playList{
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0px;
-    border-bottom: 1px solid #183D3D;
+
+#trash {
+    transition: all 0.3s ease;
 }
-.playList .head{
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+
+.icons button:hover,
+#trash:hover {
+    color: #183D3D;
 }
-.musics{
+
+#red {
+    color: #992a2a;
+}
+
+#green {
+    color: #197431;
+}
+
+#yellow {
+    color: #8d8f13;
+}
+
+.musics {
+    margin-top: 1.5em;
+    padding-bottom: 1.5em;
+    border-bottom: 2px solid rgba(24, 61, 61, 0.3);
+}
+
+.item {
     display: flex;
-    flex-direction: column;
     gap: 1em;
-    margin-top: 1em;
-    width: 100%;
-}
-.musics .mus{
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-.listItems {
-    width: 100%;
+    padding: 0.5em 1em;
+    border-radius: 1em;
+    position: relative;
+    transition: all 0.3s ease;
     position: relative;
 }
 
-.listItems .item {
-    width: 100%;
-    display: flex;
-    flex: 1;
+.item:hover {
+    background-color: rgba(24, 61, 61, 0.3);
     cursor: pointer;
-    gap: 1em;
-    transition: all 0.3s ease;
 }
-.listItems .item:hover {
-    background-color: rgba(24, 61, 61, 0.1);
+
+.item .img {
+    height: 100px;
+    width: 100px;
 }
-.data{
+
+.item .img img {
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    border-radius: 1em;
+}
+
+.item .data {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    width: 100%;
 }
-.performer{
+
+.performer {
+    margin-top: 10px;
     color: #183D3D;
 }
-.listItems button{
+
+.song-name {
+    max-width: 75%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.delete {
     position: absolute;
-    right: 15px;
-    top: 20px;
+    right: 30px;
+    top: 50%;
+    background-color: transparent;
+    color: #ffffff;
+    border: none;
+    font-size: 1.2em;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.delete:hover {
+    color: #183D3D;
+}
+
+@media only screen and (max-width: 1200px) {
+    h2 {
+        font-size: 1.2em;
+        margin-bottom: 1em;
+    }
+
+    .data * {
+        font-size: 1em;
+    }
+
+    .item .img {
+        height: 75px;
+        width: 75px;
+    }
+
+    .item .img img {
+        height: 75px;
+        width: 75px;
+        object-fit: cover;
+        border-radius: 1em;
+    }
+
+    .item {
+        padding: 0.5em 0;
+    }
+
+    .song-name {
+        max-width: 50%;
+    }
+
+    .playList,
+    .followList {
+        padding: 0.5em;
+    }
 }

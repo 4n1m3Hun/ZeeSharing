@@ -1,7 +1,8 @@
-a{
+a {
     text-decoration: none;
 }
-.login-page{
+
+.login-page {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -10,18 +11,20 @@ a{
     height: 100vh;
     color: #ffffff;
 }
-.container{
+
+.container {
     background-color: #040D12;
     width: 500px;
     max-width: 100%;
     min-height: 550px;
     border-radius: 25px;
-    box-shadow: 0 14px 28px rgba(0,0,0,0.25),
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
         0 0px 10px rgba(0, 0, 0, 0.22);
-        position: relative;
+    position: relative;
     overflow: hidden;
 }
-form{
+
+form {
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -29,18 +32,21 @@ form{
     text-align: center;
     position: relative;
 }
-h1{
+
+h1 {
     font-weight: 700;
     letter-spacing: -1.5px;
     margin: 0;
     margin-top: 2em;
     margin-bottom: 1em;
 }
-.form-control{
+
+.form-control {
     width: 75%;
     position: relative;
 }
-.form-control span{
+
+.form-control span {
     position: absolute;
     border-bottom: 3px solid #183D3D;
     left: 0;
@@ -48,10 +54,13 @@ h1{
     width: 0%;
     transition: all 0.3s ease;
 }
-.form-control input:focus ~ span{
+
+.form-control input:focus~span {
     width: 100%;
 }
-input[type="email"], input[type="password"]{
+
+input[type="email"],
+input[type="password"] {
     background-color: #040D12;
     outline: none;
     border: none;
@@ -61,12 +70,14 @@ input[type="email"], input[type="password"]{
     width: 100%;
     color: #ffffff;
 }
+
 .error {
     color: #93B1A6;
     position: absolute;
-    top: 10px;  
+    top: 10px;
 }
-button{
+
+button {
     border-radius: 20px;
     border: 1px solid #183D3D;
     background-color: #183D3D;
@@ -80,31 +91,42 @@ button{
     width: 230px;
     transition: all 0.3s ease;
 }
-button:hover{
+
+button:hover {
     background-color: #5C8374;
 }
-.links{
+
+.links {
     position: absolute;
     bottom: 10px;
 }
-.register-link, .forgot-password-link {
+
+.register-link,
+.forgot-password-link {
     margin-top: 20px;
 }
-.register-link a, .forgot-password-link a{
+
+.register-link a,
+.forgot-password-link a {
     color: #183D3D;
     text-decoration: underline;
     cursor: pointer;
     transition: all 0.3s ease;
 }
-.register-link a:hover, .forgot-password-link a:hover {
+
+.register-link a:hover,
+.forgot-password-link a:hover {
     color: #5C8374;
 }
-@media only screen and (max-width: 600px){
-    .container{
+
+@media only screen and (max-width: 600px) {
+    .container {
         background-color: transparent;
         width: 100%;
     }
-    input[type="email"], input[type="password"]{
+
+    input[type="email"],
+    input[type="password"] {
         background-color: transparent;
     }
 }

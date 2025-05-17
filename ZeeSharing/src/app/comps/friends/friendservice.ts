@@ -7,7 +7,6 @@ import { BehaviorSubject } from 'rxjs';
 export class FriendService {
   private usernameSubject = new BehaviorSubject<string | null>(null);
   username$ = this.usernameSubject.asObservable();
-
   setUsername(username: string) {
     this.usernameSubject.next(username);
   }

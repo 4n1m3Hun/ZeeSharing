@@ -1,7 +1,6 @@
 <div class="login-page">
   <div class="container">
     <form (ngSubmit)="onLogin()">
-    <!-- <form> -->
       <h1>LOGIN</h1>
       <div class="form-control">
         <input type="email" id="email" [(ngModel)]="email" name="email" required placeholder="Email">
@@ -19,13 +18,11 @@
         <button *ngIf="isOnline" type="submit">Login</button>
         <button *ngIf="!isOnline" (click)="navigateOfflineMain()">Offline</button>
         <p class="register-link">
-          New to ZeeSharing? 
+          New to ZeeSharing?
           <a *ngIf="isOnline" (click)="navigateToRegister()">Create an account</a>
           <a *ngIf="!isOnline">Create an account</a>
         </p>
       </div>
-      
     </form>
   </div>
 </div>
-<!-- "/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)" -->

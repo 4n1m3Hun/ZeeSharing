@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, query, orderBy, limit, getDocs, startAfter, addDoc, Timestamp } from '@angular/fire/firestore';
+import { Firestore, collection, query, orderBy, limit, getDocs, startAfter, addDoc, Timestamp, deleteDoc, doc, where } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 
 import {Filter} from 'bad-words';
@@ -35,7 +35,7 @@ export class ForumService {
       return {
         id: doc.id,
         ...data,
-        content: this.filter.clean(data['content']),
+        content: this.filter.clean(data['content']), // 🔸 szűrés itt
         username: this.filter.clean(data['username'])
       };
     });
@@ -64,7 +64,7 @@ export class ForumService {
       return {
         id: doc.id,
         ...data,
-        content: this.filter.clean(data['content']),
+        content: this.filter.clean(data['content']), // 🔸 szűrés itt is
         username: this.filter.clean(data['username'])
       };
     });
@@ -84,5 +84,22 @@ export class ForumService {
       username: username,
       createdAt: Timestamp.now(),
     });
+  }
+
+  async deletePost(username: string, timestamp: number) {
+    const postsRef = collection(this.firestore, 'Forum');
+  
+    const q = query(
+      postsRef,
+      where('username', '==', username),
+      where('createdAt', '==', timestamp)
+    );
+  
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      for (const docSnap of snapshot.docs) {
+        await deleteDoc(docSnap.ref);
+      }
+    }
   }
 }

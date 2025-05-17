@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Firestore, collection, query, orderBy, limit, getDocs, where, addDoc } from '@angular/fire/firestore';
+import { Firestore, collection, query, orderBy, limit, getDocs, where } from '@angular/fire/firestore';
 import { NgFor } from '@angular/common';
-import { Buffer } from 'buffer';
-
 import { EventEmitter, Input, Output } from '@angular/core';
-
 export interface Zene {
   name: string;
   audio: string;
@@ -12,7 +9,6 @@ export interface Zene {
   img?: string;
   tags?: string[];
 }
-
 @Component({
   selector: 'app-latest-music',
   standalone: true,
@@ -23,12 +19,10 @@ export interface Zene {
 export class LatestMusicComponent implements OnInit {
   @Input() latestSongs: Zene[] = [];
   @Output() songClicked = new EventEmitter<{ songs: Zene[]; index: number }>();
-
   async onSongSelected(performer: string, name: string) {
     const musicCollection = collection(this.firestore, 'Musics');
     const filteredQuery = query(musicCollection, where('performer', '==', performer));
     const musicSnapshot = await getDocs(filteredQuery);
-  
     const songClicked = await Promise.all(
       musicSnapshot.docs.map(async (docSnapshot) => {
         const data = docSnapshot.data();
@@ -41,35 +35,22 @@ export class LatestMusicComponent implements OnInit {
         } as Zene;
       })
     );
-  
     const foundIndex = songClicked.findIndex((song) => song.name === name);
-    // console.clear()
-    // console.log(songClicked);
     this.songClicked.emit({
       songs: songClicked,
       index: foundIndex,
     });
   }
-
-  
-
-
-  constructor(private firestore: Firestore) {}
-
+  constructor(private firestore: Firestore) { }
   async ngOnInit() {
     await this.loadLatestSongs();
   }
-
   async loadLatestSongs() {
     const musicCollection = collection(this.firestore, 'Musics');
     const musicQuery = query(musicCollection, orderBy('uploadDate', 'desc'), limit(6));
     const musicSnapshot = await getDocs(musicQuery);
-  
     this.latestSongs = await Promise.all(musicSnapshot.docs.map(async (docSnapshot) => {
       const data = docSnapshot.data();
-  
-
-      //console.log(mp3Img);
       return {
         name: data['name'],
         audio: data['audio'],

@@ -9,7 +9,7 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideStorage, getStorage } from '@angular/fire/storage';
-import { HttpClientModule, provideHttpClient } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { AuthGuard } from './comps/auth/auth.guard';
 
 const firebaseConfig = {
@@ -23,16 +23,20 @@ const firebaseConfig = {
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideServiceWorker('ngsw-worker.js', {
-                enabled: !isDevMode(),
-                registrationStrategy: 'registerWhenStable:30000'}),
-                provideRouter(routes), 
-                provideZoneChangeDetection({ eventCoalescing: true }), 
-                provideClientHydration(), 
-                provideFirebaseApp(() => initializeApp(firebaseConfig)),
-                provideFirestore(() => getFirestore()),
-                provideAuth(() => getAuth()),
-                provideStorage(() => getStorage()),
-                provideHttpClient(),
-                AuthGuard
-              ]
+    enabled: !isDevMode(),
+    registrationStrategy: 'registerWhenStable:30000'
+  }),
+  provideRouter(routes),
+  provideZoneChangeDetection({ eventCoalescing: true }),
+  provideClientHydration(),
+  provideFirebaseApp(() => initializeApp(firebaseConfig)),
+  provideFirestore(() => getFirestore()),
+  provideAuth(() => getAuth()),
+  provideStorage(() => getStorage()),
+  provideHttpClient(),
+    AuthGuard, provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
+  ]
 };

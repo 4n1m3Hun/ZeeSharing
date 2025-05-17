@@ -1,32 +1,78 @@
-h2{
-    margin-bottom: 30px;
-    color: #ffffff;
+* {
+  box-sizing: border-box;
 }
-.row{
-    display: flex;
+
+h2 {
+  margin-bottom: 1em;
 }
-.row .item{
-    width: 16.6%;
-    padding: 14px;
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
 }
-.square img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    cursor: pointer;
+
+.item {
+  width: 16.66%;
+  padding: 1em;
+  border-radius: 1em;
+  transition: all 0.3s ease;
 }
+
 .square {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.square img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1em;
+}
+
+.item:hover {
+  background-color: rgba(24, 61, 61, 0.3);
+  cursor: pointer;
+}
+
+.song-info {
+  padding: 1em 0;
+}
+
+.song-name {
+  margin-bottom: 10px;
+  font-weight: bold;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.song-permorfer {
+  color: #183D3D;
+}
+
+@media only screen and (max-width: 1200px) {
+  h2 {
+    font-size: 1.2em;
+    margin-bottom: 0.2em;
+  }
+
+  .item {
+    width: 33.33%;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .item {
+    width: 50%;
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .item {
     width: 100%;
-    position: relative; 
-    padding-top: 100%; 
-    overflow: hidden; 
-}
-.song-info{
-    margin-top: 15px;
-}
-.song-permorfer{
-    color: #183D3D;
+  }
 }

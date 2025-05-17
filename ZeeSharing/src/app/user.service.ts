@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Auth, User } from '@angular/fire/auth';
-import { onAuthStateChanged } from '@angular/fire/auth';
+import { Auth, User, onAuthStateChanged } from '@angular/fire/auth';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private userData: any = null;
+  private userDataSubject = new BehaviorSubject<any>(null);
+  userData$ = this.userDataSubject.asObservable();
 
   constructor(private auth: Auth, private firestore: Firestore) {
-    // Ellenőrizzük a localStorage-t, ha van már mentett felhasználó
     const storedUserData = localStorage.getItem('userData');
     if (storedUserData) {
-      this.userData = JSON.parse(storedUserData);
+      const parsed = JSON.parse(storedUserData);
+      this.userDataSubject.next(parsed);
     }
 
-    // Figyeli a bejelentkezési állapotot
     onAuthStateChanged(this.auth, async (user) => {
       if (user) {
         await this.fetchUserData(user);
@@ -27,14 +27,14 @@ export class UserService {
   }
 
   setUserData(user: any, uname: string, pic: string, tipus: string) {
-    this.userData = {
+    const newData = {
       email: user.email,
       username: uname,
       picture: pic,
       type: tipus
     };
-    // Adatok mentése localStorage-ba
-    localStorage.setItem('userData', JSON.stringify(this.userData));
+    this.userDataSubject.next(newData);
+    localStorage.setItem('userData', JSON.stringify(newData));
   }
 
   async fetchUserData(user: User) {
@@ -46,16 +46,15 @@ export class UserService {
         this.setUserData(user, userData['username'], userData['picture'], userData['type']);
       }
     } catch (error) {
-      console.error('Hiba a felhasználói adatok lekérése során:', error);
     }
   }
 
   getUserData() {
-    return this.userData;
+    return this.userDataSubject.value;
   }
 
   clearUserData() {
-    this.userData = null;
-    localStorage.removeItem('userData'); // Adatok törlése kijelentkezéskor
+    this.userDataSubject.next(null);
+    localStorage.removeItem('userData');
   }
 }

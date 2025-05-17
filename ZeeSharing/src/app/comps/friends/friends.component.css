@@ -1,35 +1,88 @@
-.dot{
-    content: ' ';
-    background-color: red;
+.green {
+    color: #5C8374;
 }
-.friend{
+
+.red {
+    color: rgb(109, 43, 43);
+}
+
+.item,
+.request {
     display: flex;
-    height: fit-content;
-    align-items: center;
     gap: 1em;
+    padding: 0.5em 1em;
+    border-radius: 1em;
     position: relative;
     transition: all 0.3s ease;
-    padding: 1em;
-    border-radius: 10px;
+    align-items: center;
+    position: relative;
 }
-.friend:hover{
-    background-color: #183D3D;
+
+.item:hover {
+    background-color: rgba(24, 61, 61, 0.3);
     cursor: pointer;
 }
-.img{
-    width: 50px;
-    height: 50px;
+
+.request:hover {
+    background-color: rgba(24, 61, 61, 0.3);
 }
-.img img{
-    width: 50px;
-    height: 50px;
+
+.item .img,
+.request .img {
+    height: 100px;
+    width: 100px;
+}
+
+.item .img img,
+.request .img img {
+    height: 100px;
+    width: 100px;
     object-fit: cover;
+    border-radius: 1em;
 }
-.friendList{
-    padding-top: 1em;
+
+.item .data {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
-fa-icon{
-    font-size: 10px;
+
+h2 {
+    margin-bottom: 1em;
+}
+
+.icons {
     position: absolute;
-    right: 10px;
+    display: flex;
+    gap: 1em;
+    right: 20px;
+    cursor: pointer;
+}
+
+.request {
+    cursor: default;
+}
+
+@media only screen and (max-width: 1200px) {
+    h2 {
+        font-size: 1.2em;
+    }
+
+    .data * {
+        font-size: 1em;
+    }
+
+    .item .img,
+    .request .img {
+        height: 75px;
+        width: 75px;
+    }
+
+    .item .img img,
+    .request .img img {
+        height: 75px;
+        width: 75px;
+        object-fit: cover;
+        border-radius: 1em;
+    }
 }

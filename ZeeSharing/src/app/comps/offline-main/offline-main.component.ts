@@ -1,11 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-import {FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {faDownload, faSignOut, faUpload, faTv, faPlus, faX, faMusic, faList, faUser, faPlay, faPause, faBackward, faForward, faRandom, faRotateBack, faVolumeHigh, faVolumeXmark, faVolumeLow  } from '@fortawesome/free-solid-svg-icons';
-
-
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faTrash, faDownload, faSignOut, faUpload, faTv, faPlus, faX, faMusic, faList, faUser, faPlay, faPause, faBackward, faForward, faRandom, faRotateBack, faVolumeHigh, faVolumeXmark, faVolumeLow } from '@fortawesome/free-solid-svg-icons';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-offline-main',
   templateUrl: './offline-main.component.html',
@@ -13,77 +11,88 @@ import {faDownload, faSignOut, faUpload, faTv, faPlus, faX, faMusic, faList, faU
   imports: [CommonModule, FormsModule, FontAwesomeModule]
 })
 export class OfflineMainComponent implements OnInit {
-  musicFiles: Array<{ name: string, performer: string, fileData: ArrayBuffer }> = [];
-
+  musicFiles: Array<{ name: string, performer: string, fileData: ArrayBuffer, ImageData: ArrayBuffer, imageUrl?: string }> = [];
+  router = inject(Router)
   ngOnInit() {
     this.loadMusic();
   }
-
   async loadMusic() {
     const request = indexedDB.open("MusicDatabase", 2);
-  
     request.onupgradeneeded = (event: any) => {
       const db = event.target.result;
-  
       if (!db.objectStoreNames.contains('songs')) {
         db.createObjectStore('songs', { keyPath: 'id' });
-        //console.log("Létrehozva a 'songs' tároló.");
       }
     };
-  
     request.onsuccess = (event: any) => {
       const db = event.target.result;
-      
-      
       const transaction = db.transaction("songs", "readonly");
       const store = transaction.objectStore("songs");
       const getAllRequest = store.getAll();
-  
       getAllRequest.onsuccess = () => {
-        this.musicFiles = getAllRequest.result;
-        //console.log("Betöltött zenék:", this.musicFiles);
+        const rawSongs = getAllRequest.result;
+        this.musicFiles = rawSongs.map((song: any) => {
+          let imageUrl: string | null = null;
+          if (song.imageData) {
+            const blob = new Blob([song.imageData], { type: 'image/jpeg' });
+            imageUrl = URL.createObjectURL(blob);
+          }
+          return {
+            ...song,
+            imageUrl: imageUrl
+          };
+        });
       };
-  
       getAllRequest.onerror = () => {
-        //console.error("Hiba a zenék betöltésekor!");
       };
     };
-  
     request.onerror = () => {
-      //console.error("Hiba az IndexedDB megnyitásakor!");
     };
   }
-    playMusic(index: number): void {
-      this.currentIndex = index;
-      this.currentMusic = this.musicFiles[this.currentIndex];
-
-      if (!this.audioPlayer) {
-        this.audioPlayer = document.createElement('audio');
-        document.body.appendChild(this.audioPlayer);
-      }
-
-      const song = this.musicFiles[index];
-      const blob = new Blob([song.fileData], { type: 'audio/mp3' });
-      const audioUrl = URL.createObjectURL(blob);
-      this.audioPlayer.src = audioUrl;
-
-    
-      this.audioPlayer.play()
-        .then(() => console.log(`A(z) ${song.name} - ${song.performer} lejátszása elkezdődött.`))
-        .catch((error) => console.error('Hiba a zene lejátszása során:', error));
-
-      this.isPlaying = true;
-      this.audioPlayer.onloadedmetadata = () => {
-        this.audioDuration = this.audioPlayer?.duration || 0;
-        this.audioCurrentTime = 0;
-        this.updateCurrentTime();
-      };
+  playMusic(index: number): void {
+    this.currentIndex = index;
+    this.currentMusic = this.musicFiles[this.currentIndex];
+    if (!this.audioPlayer) {
+      this.audioPlayer = document.createElement('audio');
+      document.body.appendChild(this.audioPlayer);
     }
-    
-    
-    
-    
-
+    const song = this.musicFiles[index];
+    const blob = new Blob([song.fileData], { type: 'audio/mp3' });
+    const audioUrl = URL.createObjectURL(blob);
+    this.audioPlayer.src = audioUrl;
+    this.audioPlayer.play();
+    this.isPlaying = true;
+    this.audioPlayer.onloadedmetadata = () => {
+      this.audioDuration = this.audioPlayer?.duration || 0;
+      this.audioCurrentTime = 0;
+      this.updateCurrentTime();
+    };
+  }
+  deleteMusic(songName: string): void {
+    const request = indexedDB.open("MusicDatabase", 2);
+    request.onsuccess = (event: any) => {
+      const db = event.target.result;
+      const transaction = db.transaction("songs", "readwrite");
+      const store = transaction.objectStore("songs");
+      const deleteRequest = store.delete(songName);
+      deleteRequest.onsuccess = () => {
+        this.musicFiles = this.musicFiles.filter(song => song.name !== songName);
+        if (this.currentMusic?.name === songName) {
+          this.audioPlayer?.pause();
+          this.currentMusic = null;
+          this.currentIndex = -1;
+          this.isPlaying = false;
+        }
+      };
+      deleteRequest.onerror = () => {
+      };
+    };
+    request.onerror = () => {
+    };
+  }
+  logout() {
+    this.router.navigate(['/login']);
+  }
   faPlay = faPlay;
   faPause = faPause;
   faBackward = faBackward;
@@ -102,38 +111,35 @@ export class OfflineMainComponent implements OnInit {
   faTv = faTv;
   faSignOut = faSignOut;
   faDownload = faDownload;
-
-  currentMusic: { name: string, performer: string, fileData: ArrayBuffer } | null = null;
+  faTrash = faTrash;
+  currentMusic: { name: string, performer: string, fileData: ArrayBuffer, ImageData: ArrayBuffer, imageUrl?: string } | null = null;
   currentIndex: number = -1;
   audioPlayer: HTMLAudioElement | null = null;
-  
   volume: number = 1;
   revolume: number = 1;
   audioDuration: number = 0;
   audioCurrentTime: number = 0;
-  
   isPlaying: boolean = false;
   isRandom: boolean = false;
   isReplay: number = 0;
-
   playNext() {
     if (this.musicFiles.length > 0) {
-      if(this.isReplay == 1){
+      if (this.isReplay == 1) {
         this.playMusic(this.currentIndex);
         this.isReplay = 0;
-      }else if(this.isReplay == 2){
+      } else if (this.isReplay == 2) {
         this.playMusic(this.currentIndex);
-      }else if(this.isRandom){
+      } else if (this.isRandom) {
         let random = Math.floor(Math.random() * this.musicFiles.length);
-        while(random == this.currentIndex){
+        while (random == this.currentIndex) {
           random = Math.floor(Math.random() * this.musicFiles.length);
         }
         this.currentIndex = random;
         this.playMusic(this.currentIndex);
-      }else{
-        if(this.currentIndex + 1 >= this.musicFiles.length){
+      } else {
+        if (this.currentIndex + 1 >= this.musicFiles.length) {
           this.currentIndex = 0;
-        }else{
+        } else {
           this.currentIndex += 1;
         }
         this.playMusic(this.currentIndex);
@@ -142,9 +148,9 @@ export class OfflineMainComponent implements OnInit {
   }
   playPrevious() {
     if (this.musicFiles.length > 0) {
-      if(this.currentIndex - 1  < 0){
-        this.currentIndex = this.musicFiles.length -1 ;
-      }else{
+      if (this.currentIndex - 1 < 0) {
+        this.currentIndex = this.musicFiles.length - 1;
+      } else {
         this.currentIndex -= 1;
       }
       this.playMusic(this.currentIndex);
@@ -155,7 +161,7 @@ export class OfflineMainComponent implements OnInit {
       const interval = setInterval(() => {
         if (this.audioPlayer) {
           this.audioCurrentTime = this.audioPlayer.currentTime;
-  
+
           if (this.audioCurrentTime >= this.audioDuration) {
             this.playNext();
             clearInterval(interval);
@@ -179,27 +185,27 @@ export class OfflineMainComponent implements OnInit {
       this.isPlaying = !this.isPlaying;
     }
   }
-  toggleVolume(){
-    if(this.volume>0){
+  toggleVolume() {
+    if (this.volume > 0) {
       this.revolume = this.volume;
       this.volume = 0;
-    }else{
+    } else {
       this.volume = this.revolume;
     }
     if (this.audioPlayer) {
       this.audioPlayer.volume = this.volume;
     }
   }
-  toggleRandom(){
+  toggleRandom() {
     this.isRandom = !this.isRandom;
     this.isReplay = 0;
   }
-  toggleReplay(){
-    if(this.isReplay == 0){
+  toggleReplay() {
+    if (this.isReplay == 0) {
       this.isReplay = 1;
-    }else if(this.isReplay == 1){
+    } else if (this.isReplay == 1) {
       this.isReplay = 2;
-    }else{
+    } else {
       this.isReplay = 0;
     }
     this.isRandom = false;
@@ -211,7 +217,7 @@ export class OfflineMainComponent implements OnInit {
       this.audioPlayer.currentTime = newTime;
     }
   }
-  formatTime(time: number){
+  formatTime(time: number) {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;

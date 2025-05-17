@@ -1,23 +1,17 @@
 import { Component, OnDestroy, OnInit, ViewChild  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import {FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {faDownload, faSignOut, faUpload, faTv, faPlus, faX, faMusic, faList, 
         faUser, faPlay, faPause, faBackward, faForward, faRandom, faRotateBack, 
         faVolumeHigh, faVolumeXmark, faVolumeLow, faCheckCircle, faXmarkCircle,
-        faSearch, faFileDownload, faComment, faCircle
+        faSearch, faFileDownload, faComment, faCircle, faUserFriends, faClock,
+        faArrowUp,faArrowDown
       } from '@fortawesome/free-solid-svg-icons';
-
-import { Storage, ref, getDownloadURL } from '@angular/fire/storage';
 import { Firestore, collection, getDocs, doc, setDoc, addDoc, query, where } from '@angular/fire/firestore';
-import { User } from '@angular/fire/auth';
 import { UserService } from '../../user.service';
-
 import { Router } from '@angular/router';
 import { Auth, signOut } from '@angular/fire/auth';
-
-/*Components*/
 import { LatestMusicComponent } from '../latest-music/latest-music.component';
 import { PopularMusicComponent } from '../popular-music/popular-music.component';
 import { RecommendedMusicComponent } from '../recommended-music/recommended-music.component';
@@ -28,11 +22,13 @@ import { SearchComponent } from '../search/search.component';
 import { FriendsComponent } from '../friends/friends.component';
 import { ChatComponent } from '../chat/chat.component';
 import { ForumComponent } from '../forum/forum.component';
-
+import { UserComponent } from '../user/user.component';
+import { LatestPodcastComponent } from '../latest-podcast/latest-podcast.component';
+import { AdminComponent } from '../admin/admin.component';
 import { PlaylistService } from './playListService';
 import { ChatService } from '../chat/chatService';
 import { Subscription } from 'rxjs';
-
+import { ChangeDetectorRef } from '@angular/core';
 export interface Zene {
   name: string;
   audio: string;
@@ -40,13 +36,12 @@ export interface Zene {
   img?: string;
   tags?: string[];
 }
-
 @Component({
   selector: 'app-main',
   imports: [CommonModule, FontAwesomeModule, FormsModule,
             LatestMusicComponent, PopularMusicComponent, RecommendedMusicComponent,
             CreatePlayListComponent, PlayListsComponent, UploadMusicComponent, SearchComponent,
-            FriendsComponent, ChatComponent, ForumComponent
+            FriendsComponent, ChatComponent, ForumComponent, UserComponent, LatestPodcastComponent, AdminComponent
   ],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css'
@@ -54,35 +49,36 @@ export interface Zene {
 export class MainComponent implements OnInit, OnDestroy {
   @ViewChild(PlayListsComponent) playListsComponent!: PlayListsComponent;
   private messagesSub!: Subscription;
-
-  constructor(private firestore: Firestore, private auth: Auth, private router: Router, private userService: UserService, private playlistService: PlaylistService,private chatService: ChatService){}
-
+  constructor(private firestore: Firestore, private auth: Auth, private router: Router, private userService: UserService, private playlistService: PlaylistService,
+    private chatService: ChatService, private cdRef: ChangeDetectorRef){}
   userData: any = null;
+  private userSub!: Subscription;
   isUnread: boolean = false;
-
+  admin: boolean = false;
   ngOnInit(): void {
-    this.userData = this.userService.getUserData();
-    window.addEventListener('beforeinstallprompt', (event: Event) => {
-      event.preventDefault();
-      this.promptEvent = event;
-      this.status = true;
+    this.userSub = this.userService.userData$.subscribe(data => {
+      this.userData = data;
     });
-    console.log("letölthető?: "+ this.status);
-
+    this.userData = this.userService.getUserData();
+    this.admin = this.isAdmin();
     this.chatService.listenForMessagesAll(this.userData['username']);
-
     this.messagesSub = this.chatService.unreadMessages$.subscribe(messages => {
       if (messages.length > 0) {
         this.isUnread = true;
+        this.cdRef.detectChanges();
       } else {
         this.isUnread = false;
+        this.cdRef.detectChanges();
       }
     });
   }
+  isAdmin(){
+    return this.userData["type"] == "admin";
+  }
   ngOnDestroy(): void {
     this.messagesSub?.unsubscribe();
+    this.userSub.unsubscribe();
   }
-
   faPlay = faPlay;
   faPause = faPause;
   faBackward = faBackward;
@@ -107,28 +103,23 @@ export class MainComponent implements OnInit, OnDestroy {
   faFileDownload = faFileDownload;
   faComment = faComment;
   faCircle = faCircle;
-
+  faUserFriends = faUserFriends;
+  faClock = faClock;
+  faArrowUp = faArrowUp;
+  faArrowDown=faArrowDown;
   songsByPerformer: Zene[] = [];
   currentMusic: Zene | null = null;
   currentIndex: number = -1;
   audioPlayer: HTMLAudioElement | null = null;
-
   volume: number = 1;
   revolume: number = 1;
   audioDuration: number = 0;
   audioCurrentTime: number = 0;
-
   isPlaying: boolean = false;
   isRandom: boolean = false;
   isReplay: number = 0;
-
-  status: boolean = false;
-
-  /*Lejátszó*/
   handleSongClicked(event: { songs: Zene[]; index: number }) {
     this.songsByPerformer = event.songs;
-    //console.clear();
-    //console.log('Songs by performer:', this.songsByPerformer);
     if (this.songsByPerformer.length > 0) {
       this.playMusic(event.index)
     }
@@ -136,16 +127,38 @@ export class MainComponent implements OnInit, OnDestroy {
   playMusic(toindex: number) {
     this.currentIndex = toindex;
     this.currentMusic = this.songsByPerformer[this.currentIndex];
-    
     if (!this.audioPlayer) {
       this.audioPlayer = document.createElement('audio');
       document.body.appendChild(this.audioPlayer);
     }
-    
     this.audioPlayer.src = this.songsByPerformer[this.currentIndex].audio;
     this.audioPlayer.play();
     this.isPlaying = true;
-
+    this.audioPlayer.onloadedmetadata = () => {
+      this.audioDuration = this.audioPlayer?.duration || 0;
+      this.audioCurrentTime = 0;
+      this.updateCurrentTime();
+      this.cdRef.detectChanges();
+    };
+    const playHistoryCollection = collection(this.firestore, 'PlayHistory');
+    addDoc(playHistoryCollection, {
+      user: this.userData?.email,
+      name: this.currentMusic.name,
+      performer: this.currentMusic.performer,
+      tags: this.currentMusic.tags || [],
+      img: this.currentMusic.img,
+      playedAt: new Date(),
+    });
+  }
+  playSongAndContinue(song: Zene) {
+    this.currentMusic = song;
+    if (!this.audioPlayer) {
+      this.audioPlayer = document.createElement('audio');
+      document.body.appendChild(this.audioPlayer);
+    }
+    this.audioPlayer.src = song.audio;
+    this.audioPlayer.play();
+    this.isPlaying = true;
     this.audioPlayer.onloadedmetadata = () => {
       this.audioDuration = this.audioPlayer?.duration || 0;
       this.audioCurrentTime = 0;
@@ -160,25 +173,6 @@ export class MainComponent implements OnInit, OnDestroy {
       img: this.currentMusic.img,
       playedAt: new Date(),
     });
-  }
-  playSongAndContinue(song: Zene) {
-    this.currentMusic = song;
-  
-    if (!this.audioPlayer) {
-      this.audioPlayer = document.createElement('audio');
-      document.body.appendChild(this.audioPlayer);
-    }
-  
-    this.audioPlayer.src = song.audio;
-    this.audioPlayer.play();
-    this.isPlaying = true;
-  
-    this.audioPlayer.onloadedmetadata = () => {
-      this.audioDuration = this.audioPlayer?.duration || 0;
-      this.audioCurrentTime = 0;
-      this.updateCurrentTime();
-    };
-  
     this.audioPlayer.onended = () => {
       this.playNext();
     };
@@ -283,71 +277,70 @@ export class MainComponent implements OnInit, OnDestroy {
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   }
-  /*zene letöltése*/
   async downloadSong(zene: Zene): Promise<void> {
     try {
-      const response = await fetch(zene.audio);
-      const fileData = await response.arrayBuffer();
-
+      const audioResponse = await fetch(zene.audio);
+      const audioData = await audioResponse.arrayBuffer();
+      let imageData: ArrayBuffer | null = null;
+      if (zene.img) {
+        try {
+          const imageResponse = await fetch(zene.img);
+          imageData = await imageResponse.arrayBuffer();
+        } catch (imgError) {
+          imageData = null;
+        }
+      }
       const db = await this.openDatabase();
       const transaction = db.transaction("songs", "readwrite");
       const store = transaction.objectStore("songs");
+
       const song = {
         name: zene.name,
         performer: zene.performer,
-        fileData: fileData
+        fileData: audioData,
+        imageData: imageData
       };
-
       store.put(song);
-      //console.log(`${zene.name} sikeresen letöltve és IndexedDB-be mentve!`);
+      alert(`${zene.name} -Downloaded!`)
     } catch (error) {
-      //console.error("Hiba a zene letöltése és mentése során:", error);
     }
   }
-
   openDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("MusicDatabase", 2);
-
       request.onupgradeneeded = function (event) {
         const db = (event.target as IDBOpenDBRequest).result;
-
         if (!db.objectStoreNames.contains("songs")) {
           db.createObjectStore("songs", { keyPath: "name" });
         }
       };
-
       request.onsuccess = function (event) {
         const db = (event.target as IDBOpenDBRequest).result;
         resolve(db);
       };
-
       request.onerror = function (event) {
         reject("Hiba az IndexedDB megnyitásakor!");
       };
     });
   }
-  /*lilépés*/
   async logout() {
     try {
       await signOut(this.auth);
       this.router.navigate(['/login'], { replaceUrl: true });
     } catch (error) {
-      //console.error('Error during logout:', error);
     }
   }
-  
-  /*menu*/
   showCurrentlyPlayList =true;
   showCreatePlaylist =false;
   showUserPlayList = false;
   showUserFriendList = false;
-
   showList: boolean = true;
   showUpload: boolean = false;
   showSearch: boolean = false;
   showChat: boolean = false;
   showForum: boolean = false;
+  showUser: boolean = false;
+  showAdmin: boolean = false;
   toggleShowCurrentlyPlaylist(){
     this.showCurrentlyPlayList = true;
     this.showUserFriendList = false;
@@ -366,13 +359,14 @@ export class MainComponent implements OnInit, OnDestroy {
     this.showUserFriendList = false;
     this.showUserPlayList = true;
   }
-
   toggleMusicList(){
     this.showUpload = false;
     this.showList = true;
     this.showSearch = false;
     this.showChat = false;
     this.showForum = false;
+    this.showUser = false;
+    this.showAdmin = false;
   }
   toggleUploadMusic(){
     this.showUpload = true;
@@ -380,6 +374,8 @@ export class MainComponent implements OnInit, OnDestroy {
     this.showSearch = false;
     this.showChat = false;
     this.showForum = false;
+    this.showUser = false;
+    this.showAdmin = false;
   }
   toggleSearch(){
     this.showUpload = false;
@@ -387,6 +383,8 @@ export class MainComponent implements OnInit, OnDestroy {
     this.showSearch = true;
     this.showChat = false;
     this.showForum = false;
+    this.showUser = false;
+    this.showAdmin = false;
   }
   toggleForum(){
     this.showUpload = false;
@@ -394,9 +392,27 @@ export class MainComponent implements OnInit, OnDestroy {
     this.showSearch = false;
     this.showChat = false;
     this.showForum = true;
+    this.showUser = false;
+    this.showAdmin = false;
   }
-
-  //add to playList
+  toggleUser(){
+    this.showUpload = false;
+    this.showList = false;
+    this.showSearch = false;
+    this.showChat = false;
+    this.showForum = false;
+    this.showUser = true;
+    this.showAdmin = false;
+  }
+  toggleAdmin(){
+    this.showUpload = false;
+    this.showList = false;
+    this.showSearch = false;
+    this.showChat = false;
+    this.showForum = false;
+    this.showUser = false;
+    this.showAdmin = true;
+  }
   showPlaylistMenu = false;
   userPlaylists: { title: string; type: string, contains: boolean }[] = [];
   togglePlaylistMenu() {
@@ -404,7 +420,6 @@ export class MainComponent implements OnInit, OnDestroy {
     if (this.showPlaylistMenu) {
       this.loadUserPlaylists();
     }
-    console.log(this.userData);
   }
   async loadUserPlaylists() {
     const playlistsCollection = collection(this.firestore, 'PlayLists');
@@ -417,27 +432,21 @@ export class MainComponent implements OnInit, OnDestroy {
       contains: (docSnapshot.data()['songs'] || []).some((song: Zene) => song.name === this.currentMusic?.name)
     }));
   }
-
   async addToPlaylist(playlist: {title: string; type: string, contains: boolean}) {
     if (!this.currentMusic) return;
-
     const playlistsCollection = collection(this.firestore, 'PlayLists');
     const playlistsQuery = query(playlistsCollection, where('user', '==', this.userData?.username ), where('title', '==', playlist.title));
     const querySnapshot = await getDocs(playlistsQuery);
-    
     if (!querySnapshot.empty) {
       const playlistDoc = querySnapshot.docs[0];
       const playlistData = playlistDoc.data();
       const musicList: Zene[] = playlistData['songs'] || [];
-  
       const musicIndex = musicList.findIndex(m => m.name === this.currentMusic?.name);
-  
       if (musicIndex === -1) {
         musicList.push(this.currentMusic);
       } else {
         musicList.splice(musicIndex, 1);
       }
-  
       await setDoc(doc(this.firestore, 'PlayLists', playlistDoc.id), { 
         ...playlistData, 
         songs: musicList 
@@ -447,25 +456,30 @@ export class MainComponent implements OnInit, OnDestroy {
       this.showPlaylistMenu = !this.showPlaylistMenu;
     }
   }
-
-  //Install PWA
-
-  promptEvent: any = null;
-  public installPwa() {
-    this.status = false;
-    this.promptEvent.prompt();
-    this.promptEvent.userChoice.then((choiceResult: { outcome: string; }) => {
-        this.promptEvent = null;
-    });
-  }
-
-
-  //MSG
   checkMSG(uname: string){
     this.showUpload = false;
     this.showList = false;
     this.showSearch = false;
     this.showForum = false;
     this.showChat = true;
+    this.showUser = false;
+    this.showAdmin = false;
+  }
+  shutdownScheduled = false;
+  private shutdownTimeoutId: any = null;
+  toggleShutdownTimer() {
+    if (this.shutdownScheduled) {
+      clearTimeout(this.shutdownTimeoutId);
+      this.shutdownScheduled = false;
+    } else {
+      this.shutdownTimeoutId = setTimeout(() => {
+        this.logout();
+      }, 30 * 1000);
+      this.shutdownScheduled = true;
+    }
+  }
+  showMenuLeft: boolean = false;
+  toggleShowMenuLeft(){
+    this.showMenuLeft = !this.showMenuLeft;
   }
 }

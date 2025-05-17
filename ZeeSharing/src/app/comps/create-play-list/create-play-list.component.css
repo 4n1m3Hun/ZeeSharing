@@ -1,22 +1,17 @@
-:root {
-    --color1: #ffffff;
-    --color2: #000000;
-    --color3: #040D12;
-    --color4: #183D3D;
-    --color5: #5C8374;
-    --color6: #93B1A6;
-}
-.createPlayList{
+.createPlayList {
     background-color: #040D12;
     border: none;
     border-radius: 15px;
     padding: 1em;
 }
-h1{
+
+h1 {
     margin-bottom: 1em;
     text-align: center;
 }
-input, select{
+
+input,
+select {
     width: 100%;
     margin: 0.5em 0;
     background-color: #040D12;
@@ -26,9 +21,10 @@ input, select{
     padding: 12px 0;
     color: #ffffff;
 }
-input{
-}
-button{
+
+input {}
+
+button {
     border-radius: 20px;
     background-color: #183D3D;
     font-size: 15px;
@@ -43,6 +39,7 @@ button{
     margin-top: 1em;
     transition: all 0.3s ease;
 }
-button:hover{
+
+button:hover {
     background-color: #5C8374;
 }
