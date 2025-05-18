@@ -474,7 +474,7 @@ export class MainComponent implements OnInit, OnDestroy {
     } else {
       this.shutdownTimeoutId = setTimeout(() => {
         this.logout();
-      }, 30 * 1000);
+      }, 30 * 60 * 1000);
       this.shutdownScheduled = true;
     }
   }
