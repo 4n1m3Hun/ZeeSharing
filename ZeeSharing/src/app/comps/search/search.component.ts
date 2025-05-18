@@ -75,7 +75,7 @@ export class SearchComponent {
     this.searchResults.tagMusics = tagSnapshot.docs.map(doc => doc.data());
     const podcastQuery = query(podcastCollection, where('name', '>=', text), where('name', '<=', text + '\uf8ff'));
     const podcastSnapshot = await getDocs(podcastQuery);
-    this.searchResults.musics = podcastSnapshot.docs.map(doc => doc.data());
+    this.searchResults.podcast = podcastSnapshot.docs.map(doc => doc.data());
     const performerQuery = query(usersCollection, where('type', 'in', ['performer', "podcast"]), where('username', '>=', text), where('username', '<=', text + '\uf8ff'));
     const performerSnapshot = await getDocs(performerQuery);
     this.searchResults.performers = performerSnapshot.docs.map(doc => doc.data());

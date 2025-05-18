@@ -40,6 +40,18 @@
       }
     },
     {
+      "name": "firestore-realtime",
+      "urls": [
+        "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 0,
+        "maxAge": "0u",
+        "timeout": "0u"
+      }
+    },
+    {
       "name": "firestore-api",
       "urls": [
         "https://firestore.googleapis.com/**"

@@ -7,6 +7,7 @@ h2 {
     height: calc(100vh - 330px);
     position: relative;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .file-upload::-webkit-scrollbar {
