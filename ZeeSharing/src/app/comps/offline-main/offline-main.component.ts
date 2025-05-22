@@ -17,18 +17,18 @@ export class OfflineMainComponent implements OnInit {
     this.loadMusic();
   }
   async loadMusic() {
-    const request = indexedDB.open("MusicDatabase", 2);
-    request.onupgradeneeded = (event: any) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains('songs')) {
-        db.createObjectStore('songs', { keyPath: 'id' });
+    try {
+      const db = await this.openDatabase();
+
+      if (!db.objectStoreNames.contains("songs")) {
+        console.warn("Nincs 'songs' objectStore az adatbázisban");
+        return;
       }
-    };
-    request.onsuccess = (event: any) => {
-      const db = event.target.result;
+
       const transaction = db.transaction("songs", "readonly");
       const store = transaction.objectStore("songs");
       const getAllRequest = store.getAll();
+
       getAllRequest.onsuccess = () => {
         const rawSongs = getAllRequest.result;
         this.musicFiles = rawSongs.map((song: any) => {
@@ -39,16 +39,20 @@ export class OfflineMainComponent implements OnInit {
           }
           return {
             ...song,
-            imageUrl: imageUrl
+            imageUrl
           };
         });
       };
+
       getAllRequest.onerror = () => {
+        console.error("Hiba a dalok betöltésekor");
       };
-    };
-    request.onerror = () => {
-    };
+
+    } catch (error) {
+      console.error("loadMusic hiba:", error);
+    }
   }
+
   playMusic(index: number): void {
     this.currentIndex = index;
     this.currentMusic = this.musicFiles[this.currentIndex];
@@ -68,13 +72,14 @@ export class OfflineMainComponent implements OnInit {
       this.updateCurrentTime();
     };
   }
-  deleteMusic(songName: string): void {
-    const request = indexedDB.open("MusicDatabase", 2);
-    request.onsuccess = (event: any) => {
-      const db = event.target.result;
+  async deleteMusic(songName: string) {
+    try {
+      const db = await this.openDatabase();
+
       const transaction = db.transaction("songs", "readwrite");
       const store = transaction.objectStore("songs");
       const deleteRequest = store.delete(songName);
+
       deleteRequest.onsuccess = () => {
         this.musicFiles = this.musicFiles.filter(song => song.name !== songName);
         if (this.currentMusic?.name === songName) {
@@ -84,12 +89,37 @@ export class OfflineMainComponent implements OnInit {
           this.isPlaying = false;
         }
       };
+
       deleteRequest.onerror = () => {
+        console.error("Hiba a zene törlésekor");
       };
-    };
-    request.onerror = () => {
-    };
+
+    } catch (error) {
+      console.error("deleteMusic hiba:", error);
+    }
   }
+  openDatabase(version = 4): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("MusicDatabase", version);
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (db.objectStoreNames.contains("songs")) {
+          db.deleteObjectStore("songs");
+        }
+        db.createObjectStore("songs", { keyPath: "name" });
+      };
+
+      request.onsuccess = (event) => {
+        resolve((event.target as IDBOpenDBRequest).result);
+      };
+
+      request.onerror = () => {
+        reject("Hiba az IndexedDB megnyitásakor!");
+      };
+    });
+  }
+
   logout() {
     this.router.navigate(['/login']);
   }

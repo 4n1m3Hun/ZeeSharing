@@ -64,7 +64,7 @@ export class ForumService {
       return {
         id: doc.id,
         ...data,
-        content: this.filter.clean(data['content']), // 🔸 szűrés itt is
+        content: this.filter.clean(data['content']),
         username: this.filter.clean(data['username'])
       };
     });

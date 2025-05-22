@@ -1,13 +1,14 @@
-import { Component, OnDestroy, OnInit, ViewChild  } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {faDownload, faSignOut, faUpload, faTv, faPlus, faX, faMusic, faList, 
-        faUser, faPlay, faPause, faBackward, faForward, faRandom, faRotateBack, 
-        faVolumeHigh, faVolumeXmark, faVolumeLow, faCheckCircle, faXmarkCircle,
-        faSearch, faFileDownload, faComment, faCircle, faUserFriends, faClock,
-        faArrowUp,faArrowDown
-      } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  faDownload, faSignOut, faUpload, faTv, faPlus, faX, faMusic, faList,
+  faUser, faPlay, faPause, faBackward, faForward, faRandom, faRotateBack,
+  faVolumeHigh, faVolumeXmark, faVolumeLow, faCheckCircle, faXmarkCircle,
+  faSearch, faFileDownload, faComment, faCircle, faUserFriends, faClock,
+  faArrowUp, faArrowDown
+} from '@fortawesome/free-solid-svg-icons';
 import { Firestore, collection, getDocs, doc, setDoc, addDoc, query, where } from '@angular/fire/firestore';
 import { UserService } from '../../user.service';
 import { Router } from '@angular/router';
@@ -39,9 +40,9 @@ export interface Zene {
 @Component({
   selector: 'app-main',
   imports: [CommonModule, FontAwesomeModule, FormsModule,
-            LatestMusicComponent, PopularMusicComponent, RecommendedMusicComponent,
-            CreatePlayListComponent, PlayListsComponent, UploadMusicComponent, SearchComponent,
-            FriendsComponent, ChatComponent, ForumComponent, UserComponent, LatestPodcastComponent, AdminComponent
+    LatestMusicComponent, PopularMusicComponent, RecommendedMusicComponent,
+    CreatePlayListComponent, PlayListsComponent, UploadMusicComponent, SearchComponent,
+    FriendsComponent, ChatComponent, ForumComponent, UserComponent, LatestPodcastComponent, AdminComponent
   ],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css'
@@ -50,7 +51,7 @@ export class MainComponent implements OnInit, OnDestroy {
   @ViewChild(PlayListsComponent) playListsComponent!: PlayListsComponent;
   private messagesSub!: Subscription;
   constructor(private firestore: Firestore, private auth: Auth, private router: Router, private userService: UserService, private playlistService: PlaylistService,
-    private chatService: ChatService, private cdRef: ChangeDetectorRef){}
+    private chatService: ChatService, private cdRef: ChangeDetectorRef) { }
   userData: any = null;
   private userSub!: Subscription;
   isUnread: boolean = false;
@@ -72,7 +73,7 @@ export class MainComponent implements OnInit, OnDestroy {
       }
     });
   }
-  isAdmin(){
+  isAdmin() {
     return this.userData["type"] == "admin";
   }
   ngOnDestroy(): void {
@@ -106,7 +107,7 @@ export class MainComponent implements OnInit, OnDestroy {
   faUserFriends = faUserFriends;
   faClock = faClock;
   faArrowUp = faArrowUp;
-  faArrowDown=faArrowDown;
+  faArrowDown = faArrowDown;
   songsByPerformer: Zene[] = [];
   currentMusic: Zene | null = null;
   currentIndex: number = -1;
@@ -179,22 +180,22 @@ export class MainComponent implements OnInit, OnDestroy {
   }
   playNext() {
     if (this.songsByPerformer.length > 0) {
-      if(this.isReplay == 1){
+      if (this.isReplay == 1) {
         this.playMusic(this.currentIndex);
         this.isReplay = 0;
-      }else if(this.isReplay == 2){
+      } else if (this.isReplay == 2) {
         this.playMusic(this.currentIndex);
-      }else if(this.isRandom){
+      } else if (this.isRandom) {
         let random = Math.floor(Math.random() * this.songsByPerformer.length);
-        while(random == this.currentIndex){
+        while (random == this.currentIndex) {
           random = Math.floor(Math.random() * this.songsByPerformer.length);
         }
         this.currentIndex = random;
         this.playMusic(this.currentIndex);
-      }else{
-        if(this.currentIndex + 1 >= this.songsByPerformer.length){
+      } else {
+        if (this.currentIndex + 1 >= this.songsByPerformer.length) {
           this.currentIndex = 0;
-        }else{
+        } else {
           this.currentIndex += 1;
         }
         this.playMusic(this.currentIndex);
@@ -203,9 +204,9 @@ export class MainComponent implements OnInit, OnDestroy {
   }
   playPrevious() {
     if (this.songsByPerformer.length > 0) {
-      if(this.currentIndex - 1  < 0){
-        this.currentIndex = this.songsByPerformer.length -1 ;
-      }else{
+      if (this.currentIndex - 1 < 0) {
+        this.currentIndex = this.songsByPerformer.length - 1;
+      } else {
         this.currentIndex -= 1;
       }
       this.playMusic(this.currentIndex);
@@ -216,7 +217,7 @@ export class MainComponent implements OnInit, OnDestroy {
       const interval = setInterval(() => {
         if (this.audioPlayer) {
           this.audioCurrentTime = this.audioPlayer.currentTime;
-  
+
           if (this.audioCurrentTime >= this.audioDuration) {
             this.playNext();
             clearInterval(interval);
@@ -240,27 +241,27 @@ export class MainComponent implements OnInit, OnDestroy {
       this.isPlaying = !this.isPlaying;
     }
   }
-  toggleVolume(){
-    if(this.volume>0){
+  toggleVolume() {
+    if (this.volume > 0) {
       this.revolume = this.volume;
       this.volume = 0;
-    }else{
+    } else {
       this.volume = this.revolume;
     }
     if (this.audioPlayer) {
       this.audioPlayer.volume = this.volume;
     }
   }
-  toggleRandom(){
+  toggleRandom() {
     this.isRandom = !this.isRandom;
     this.isReplay = 0;
   }
-  toggleReplay(){
-    if(this.isReplay == 0){
+  toggleReplay() {
+    if (this.isReplay == 0) {
       this.isReplay = 1;
-    }else if(this.isReplay == 1){
+    } else if (this.isReplay == 1) {
       this.isReplay = 2;
-    }else{
+    } else {
       this.isReplay = 0;
     }
     this.isRandom = false;
@@ -272,57 +273,96 @@ export class MainComponent implements OnInit, OnDestroy {
       this.audioPlayer.currentTime = newTime;
     }
   }
-  formatTime(time: number){
+  formatTime(time: number) {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   }
   async downloadSong(zene: Zene): Promise<void> {
     try {
+      if (!zene.name || !zene.audio) {
+        console.error("Hiányzó név vagy audio URL:", zene);
+        return;
+      }
+
       const audioResponse = await fetch(zene.audio);
       const audioData = await audioResponse.arrayBuffer();
+      if (!(audioData instanceof ArrayBuffer)) {
+        throw new Error("Audio nem megfelelő formátum.");
+      }
+
       let imageData: ArrayBuffer | null = null;
       if (zene.img) {
         try {
           const imageResponse = await fetch(zene.img);
           imageData = await imageResponse.arrayBuffer();
+          if (!(imageData instanceof ArrayBuffer)) {
+            console.warn("Kép nem megfelelő formátum, kihagyva.");
+            imageData = null;
+          }
         } catch (imgError) {
+          console.warn("Kép letöltési hiba:", imgError);
           imageData = null;
         }
       }
+
       const db = await this.openDatabase();
-      const transaction = db.transaction("songs", "readwrite");
-      const store = transaction.objectStore("songs");
+      if (!db.objectStoreNames.contains("songs")) {
+        console.error("A 'songs' objectStore nem létezik!");
+        return;
+      }
 
       const song = {
         name: zene.name,
-        performer: zene.performer,
+        performer: zene.performer || "Ismeretlen",
         fileData: audioData,
         imageData: imageData
       };
-      store.put(song);
-      alert(`${zene.name} -Downloaded!`)
+
+      console.log("Mentésre kerülő objektum:", song);
+
+      const transaction = db.transaction("songs", "readwrite");
+      const store = transaction.objectStore("songs");
+      const request = store.put(song);
+
+      request.onsuccess = () => {
+        alert(`${zene.name} - letöltve!`);
+      };
+
+      request.onerror = () => {
+        console.error("Mentési hiba:", request.error);
+      };
+
     } catch (error) {
+      console.error("Hiba a letöltés során:", error);
     }
   }
+
   openDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("MusicDatabase", 2);
+      const request = indexedDB.open("MusicDatabase", 4);
+
       request.onupgradeneeded = function (event) {
         const db = (event.target as IDBOpenDBRequest).result;
-        if (!db.objectStoreNames.contains("songs")) {
-          db.createObjectStore("songs", { keyPath: "name" });
+
+        if (db.objectStoreNames.contains("songs")) {
+          db.deleteObjectStore("songs")
         }
+        db.createObjectStore("songs", { keyPath: "name" });
       };
+
       request.onsuccess = function (event) {
         const db = (event.target as IDBOpenDBRequest).result;
         resolve(db);
       };
-      request.onerror = function (event) {
+
+      request.onerror = function () {
         reject("Hiba az IndexedDB megnyitásakor!");
       };
     });
   }
+
+
   async logout() {
     try {
       await signOut(this.auth);
@@ -330,8 +370,8 @@ export class MainComponent implements OnInit, OnDestroy {
     } catch (error) {
     }
   }
-  showCurrentlyPlayList =true;
-  showCreatePlaylist =false;
+  showCurrentlyPlayList = true;
+  showCreatePlaylist = false;
   showUserPlayList = false;
   showUserFriendList = false;
   showList: boolean = true;
@@ -341,7 +381,7 @@ export class MainComponent implements OnInit, OnDestroy {
   showForum: boolean = false;
   showUser: boolean = false;
   showAdmin: boolean = false;
-  toggleShowCurrentlyPlaylist(){
+  toggleShowCurrentlyPlaylist() {
     this.showCurrentlyPlayList = true;
     this.showUserFriendList = false;
     this.showUserPlayList = false;
@@ -349,17 +389,17 @@ export class MainComponent implements OnInit, OnDestroy {
   toggleCreatePlaylist() {
     this.showCreatePlaylist = !this.showCreatePlaylist;
   }
-  toggleShowUserFriendList(){
+  toggleShowUserFriendList() {
     this.showCurrentlyPlayList = false;
     this.showUserFriendList = true;
     this.showUserPlayList = false;
   }
-  toggleShowUserPlayList(){
+  toggleShowUserPlayList() {
     this.showCurrentlyPlayList = false;
     this.showUserFriendList = false;
     this.showUserPlayList = true;
   }
-  toggleMusicList(){
+  toggleMusicList() {
     this.showUpload = false;
     this.showList = true;
     this.showSearch = false;
@@ -368,7 +408,7 @@ export class MainComponent implements OnInit, OnDestroy {
     this.showUser = false;
     this.showAdmin = false;
   }
-  toggleUploadMusic(){
+  toggleUploadMusic() {
     this.showUpload = true;
     this.showList = false;
     this.showSearch = false;
@@ -377,7 +417,7 @@ export class MainComponent implements OnInit, OnDestroy {
     this.showUser = false;
     this.showAdmin = false;
   }
-  toggleSearch(){
+  toggleSearch() {
     this.showUpload = false;
     this.showList = false;
     this.showSearch = true;
@@ -386,7 +426,7 @@ export class MainComponent implements OnInit, OnDestroy {
     this.showUser = false;
     this.showAdmin = false;
   }
-  toggleForum(){
+  toggleForum() {
     this.showUpload = false;
     this.showList = false;
     this.showSearch = false;
@@ -395,7 +435,7 @@ export class MainComponent implements OnInit, OnDestroy {
     this.showUser = false;
     this.showAdmin = false;
   }
-  toggleUser(){
+  toggleUser() {
     this.showUpload = false;
     this.showList = false;
     this.showSearch = false;
@@ -404,7 +444,7 @@ export class MainComponent implements OnInit, OnDestroy {
     this.showUser = true;
     this.showAdmin = false;
   }
-  toggleAdmin(){
+  toggleAdmin() {
     this.showUpload = false;
     this.showList = false;
     this.showSearch = false;
@@ -432,10 +472,10 @@ export class MainComponent implements OnInit, OnDestroy {
       contains: (docSnapshot.data()['songs'] || []).some((song: Zene) => song.name === this.currentMusic?.name)
     }));
   }
-  async addToPlaylist(playlist: {title: string; type: string, contains: boolean}) {
+  async addToPlaylist(playlist: { title: string; type: string, contains: boolean }) {
     if (!this.currentMusic) return;
     const playlistsCollection = collection(this.firestore, 'PlayLists');
-    const playlistsQuery = query(playlistsCollection, where('user', '==', this.userData?.username ), where('title', '==', playlist.title));
+    const playlistsQuery = query(playlistsCollection, where('user', '==', this.userData?.username), where('title', '==', playlist.title));
     const querySnapshot = await getDocs(playlistsQuery);
     if (!querySnapshot.empty) {
       const playlistDoc = querySnapshot.docs[0];
@@ -447,16 +487,16 @@ export class MainComponent implements OnInit, OnDestroy {
       } else {
         musicList.splice(musicIndex, 1);
       }
-      await setDoc(doc(this.firestore, 'PlayLists', playlistDoc.id), { 
-        ...playlistData, 
-        songs: musicList 
+      await setDoc(doc(this.firestore, 'PlayLists', playlistDoc.id), {
+        ...playlistData,
+        songs: musicList
       });
       this.playListsComponent.refresh();
-  
+
       this.showPlaylistMenu = !this.showPlaylistMenu;
     }
   }
-  checkMSG(uname: string){
+  checkMSG(uname: string) {
     this.showUpload = false;
     this.showList = false;
     this.showSearch = false;
@@ -479,7 +519,7 @@ export class MainComponent implements OnInit, OnDestroy {
     }
   }
   showMenuLeft: boolean = false;
-  toggleShowMenuLeft(){
+  toggleShowMenuLeft() {
     this.showMenuLeft = !this.showMenuLeft;
   }
 }
